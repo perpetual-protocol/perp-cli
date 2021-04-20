@@ -1,0 +1,11 @@
+{
+  "name": "perp-cli",
+  "version": "0.1.0",
+  "description": "CLI for Perpetual Protocol",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yuren Ju <yurenju@gmail.com>",
+  "license": "BSD-3-Clause"
+}
