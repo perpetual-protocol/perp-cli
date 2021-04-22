@@ -5,8 +5,8 @@ perp-cli is a CLI for showing information
 ## Basic
 
 ```shell
-# List position
-$ perp position [--trader=<trader_address>] [--amm=<amm_address>] [--limit=<limit>]
+# List position history
+$ perp history [--trader=<trader_address>] [--amm=<amm_address>] [--limit=<limit>]
 
 # show portfolio
 $ perp portfolio <trader_address>
