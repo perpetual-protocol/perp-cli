@@ -4,19 +4,30 @@
     "description": "CLI for Perpetual Protocol",
     "main": "build/index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsc -p ."
+        "test": "nyc mocha",
+        "prebuild": "npm run generate-type",
+        "build": "tsc -p .",
+        "generate-type": "ts-node script/generate-type.ts"
     },
     "author": "Yuren Ju <yurenju@gmail.com>",
     "license": "BSD-3-Clause",
     "devDependencies": {
         "@tsconfig/recommended": "1.0.1",
+        "@typechain/ethers-v5": "6.0.5",
+        "@types/chai": "4.2.16",
+        "@types/mocha": "8.2.2",
         "@types/node": "14.14.41",
         "@types/yargs": "16.0.1",
+        "chai": "4.3.4",
+        "mocha": "8.3.2",
+        "nyc": "15.1.0",
+        "ts-generator": "0.1.1",
         "ts-node": "9.1.1",
+        "typechain": "4.0.3",
         "typescript": "4.2.4"
     },
     "dependencies": {
+        "@perp/contract": "2.1.0",
         "yargs": "16.2.0"
     }
 }
