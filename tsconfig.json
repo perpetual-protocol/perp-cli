@@ -3,6 +3,6 @@
         "outDir": "build",
         "rootDir": "src"
     },
-    "include": ["src/**/*", "test/**/*"],
+    "include": ["src/**/*"],
     "extends": "@tsconfig/recommended/tsconfig.json"
 }
