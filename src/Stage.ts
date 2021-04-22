@@ -20,6 +20,6 @@ export class Stage {
     }
 }
 
-export function getStage(): StageName {
+export function getStageName(): StageName {
     return new Stage(process.env.PERP_STAGE).name
 }
