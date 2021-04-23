@@ -37,3 +37,15 @@ for example, you want to open a long position for BTC, the execution file will b
     leverage: 2
     baseAssetAmountLimit: 100
 ```
+
+# Development
+
+for developing, you can use `ts-node` to execute and test the command, e.g.:
+
+```shell
+# in production version
+$ perp position
+
+# in developing
+$ npx ts-node src/index.ts position
+```
