@@ -1,8 +1,11 @@
 {
-    "cSpell.words": [
-        "perp",
-        "typechain"
-    ],
+    "cSpell.words": ["perp", "typechain"],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": false,
+    "[typescript]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    }
 }

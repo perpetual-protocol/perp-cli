@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
-        "outDir": "build"
+        "outDir": "build",
+        "resolveJsonModule": true
     },
-    "include": ["src/**/*", "test/**/*"],
+    "include": ["src/**/*", "test/**/*", "script/**/*"],
     "extends": "@tsconfig/recommended/tsconfig.json"
 }

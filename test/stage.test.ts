@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import { Stage, getStageName, StageName } from "../src/Stage"
+import { Stage, getStageName, StageName } from "../src/stage"
 
 describe("getStage", () => {
     it("gets production as default", () => {
