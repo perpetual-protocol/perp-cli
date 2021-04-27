@@ -20,16 +20,15 @@ function instance(
 }
 
 const ammCommand: CommandModule = {
-    command: "amm",
+    command: "amm [<amm_addr>]",
     describe: "show amms' status",
     builder: yargs =>
         yargs
-            .positional("short", {
-                alias: "s",
-                describe: "list amm pairs",
-            })
+            .boolean("short")
+            .alias("short", ["s"])
+            .describe("short", "only list pair/address")
             .positional("amm_addr", {
-                describe: "list the status of the specific amm",
+                describe: "amm's address",
                 type: "string",
             }),
 
@@ -53,7 +52,12 @@ const ammCommand: CommandModule = {
         ) as ClearingHouse
 
         let ammAddressList
-        ammAddressList = await insuranceFund.getAllAmms()
+        if (argv.amm_addr) {
+            ammAddressList = [argv.amm_addr as string]
+        } else {
+            ammAddressList = await insuranceFund.getAllAmms()
+        }
+
         for (const it of ammAddressList) {
             const amm = instance(it, AmmArtifact.abi, provider) as Amm
             const priceFeedKey = utils.parseBytes32String(await amm.priceFeedKey())
