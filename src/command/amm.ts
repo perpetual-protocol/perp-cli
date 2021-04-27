@@ -21,18 +21,24 @@ function instance(
 
 const ammCommand: CommandModule = {
     command: "amm",
-    describe: "show amm status",
+    describe: "show amms' status",
     builder: yargs =>
-        yargs.option("short", {
-            alias: "s",
-            type: "string",
-            describe: "list amm pairs",
-        }),
+        yargs
+            .positional("short", {
+                alias: "s",
+                describe: "list amm pairs",
+            })
+            .positional("amm_addr", {
+                describe: "list the status of the specific amm",
+                type: "string",
+            }),
+
     handler: async argv => {
         const stageName = getStageName()
         const provider = getProvider()
         const metadata = await fetchMetadata(stageName)
         const layer2Contracts = metadata.layers.layer2.contracts
+        const flagShortList = argv.short as boolean
 
         const insuranceFund = instance(
             layer2Contracts.InsuranceFund.address,
@@ -46,7 +52,8 @@ const ammCommand: CommandModule = {
             provider,
         ) as ClearingHouse
 
-        const ammAddressList = await insuranceFund.getAllAmms()
+        let ammAddressList
+        ammAddressList = await insuranceFund.getAllAmms()
         for (const it of ammAddressList) {
             const amm = instance(it, AmmArtifact.abi, provider) as Amm
             const priceFeedKey = utils.parseBytes32String(await amm.priceFeedKey())
@@ -69,27 +76,34 @@ const ammCommand: CommandModule = {
                 )
             }
 
-            console.log(chalk.green(`${priceFeedKey}/USDC`))
+            if (flagShortList) {
+                console.log(formatProperty(`${priceFeedKey}/USDC`, it))
+            } else {
+                console.log(chalk.green(`${priceFeedKey}/USDC`))
 
-            console.log(formatProperty("Proxy Address", it))
-            console.log(
-                formatProperty("OpenInterestNotionalCap", utils.formatEther(openInterestNotionalCap.toString())) +
-                    " USDC",
-            )
-            console.log(
-                formatProperty("OpenInterestNotional", utils.formatEther(openInterestNotional.toString())) + " USDC",
-            )
-            console.log(
-                formatProperty("MaxHoldingBaseAsset", utils.formatEther(maxHoldingBaseAsset.toString())) +
-                    ` ${priceFeedKey}`,
-            )
-            console.log(formatProperty("QuoteAssetReserve", utils.formatEther(quoteAssetReserve.toString())) + " USDC")
-            console.log(
-                formatProperty("BaseAssetReserve", utils.formatEther(baseAssetReserve.toString())) +
-                    ` ${priceFeedKey}USDC`,
-            )
-            console.log(formatProperty("PriceFeed", priceFeedName))
-            console.log("")
+                console.log(formatProperty("Proxy Address", it))
+                console.log(
+                    formatProperty("OpenInterestNotionalCap", utils.formatEther(openInterestNotionalCap.toString())) +
+                        " USDC",
+                )
+                console.log(
+                    formatProperty("OpenInterestNotional", utils.formatEther(openInterestNotional.toString())) +
+                        " USDC",
+                )
+                console.log(
+                    formatProperty("MaxHoldingBaseAsset", utils.formatEther(maxHoldingBaseAsset.toString())) +
+                        ` ${priceFeedKey}`,
+                )
+                console.log(
+                    formatProperty("QuoteAssetReserve", utils.formatEther(quoteAssetReserve.toString())) + " USDC",
+                )
+                console.log(
+                    formatProperty("BaseAssetReserve", utils.formatEther(baseAssetReserve.toString())) +
+                        ` ${priceFeedKey}USDC`,
+                )
+                console.log(formatProperty("PriceFeed", priceFeedName))
+                console.log("")
+            }
         }
     },
 }
