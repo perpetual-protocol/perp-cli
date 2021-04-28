@@ -2,22 +2,14 @@ import AmmArtifact from "@perp/contract/build/contracts/src/Amm.sol/Amm.json"
 import InsuranceFundArtifact from "@perp/contract/build/contracts/src/InsuranceFund.sol/InsuranceFund.json"
 import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHouse.sol/ClearingHouse.json"
 import chalk from "chalk"
-import { Fragment, JsonFragment } from "@ethersproject/abi"
-import { Contract, providers, utils } from "ethers"
+import { utils } from "ethers"
 import { CommandModule } from "yargs"
 import { formatProperty } from "../format"
 import { fetchMetadata } from "../metadata"
 import { getProvider } from "../provider"
 import { getStageName } from "../stage"
 import { InsuranceFund, Amm, ClearingHouse } from "../type"
-
-function instance(
-    address: string,
-    abi: Array<string | Fragment | JsonFragment>,
-    provider: providers.Provider,
-): Contract {
-    return new Contract(address, abi, provider) as Contract
-}
+import { instance } from "./utils/tx"
 
 const ammCommand: CommandModule = {
     command: "amm [<amm_addr>]",
