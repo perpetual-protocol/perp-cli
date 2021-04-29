@@ -1,4 +1,4 @@
-perp-cli is a CLI for showing information
+`perp-cli` is a CLI for showing information from Perpetual Protocol
 
 # Installation
 
@@ -17,37 +17,37 @@ $ perp position [--trader=<trader_address>] [--pair=<pair>] [--block-limit=<bloc
 $ perp portfolio <trader_address>
 
 # show amm information
-$ perp amm [<amm_address>] [--short]
+$ perp amm [<amm_address>] [--short] //--short option provides a brief summary
 ```
 
 ## Advanced (Not available yet)
 
-use `PERP_MNEMONIC=<mnemonic>` to set a private key for manipulation, then you can use `perp exec` to execute transactions with an execution file.
+Use `PERP_MNEMONIC=<mnemonic>` to set a private key. Then you can use `perp exec` to execute transactions with an execution file.
 
 ```shell
 $ perp exec <filename>
 ```
 
-for example, you want to open a long position for BTC, the execution file will be like this:
+For example, if you want to open a long position for BTC, the execution file will be as follows:
 
 ```
 - action: openPosition
   args:
     amm: <amm_address>
-    side: 0|1
+    side: 0|1 // Indicates a long position
     quoteAssetAmount: 1000
     leverage: 2
-    baseAssetAmountLimit: 100
+    baseAssetAmountLimit: 100 // Set to control slippage
 ```
 
 # Development
 
-for developing, you can use `ts-node` to execute and test the command, e.g.:
+For testing, you can use `ts-node` to execute and test commands, e.g.:
 
 ```shell
-# in production version
+# Mainnet
 $ perp position
 
-# in developing
+# Testnet
 $ npx ts-node src/index.ts position
 ```
