@@ -4,12 +4,12 @@ import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHo
 import chalk from "chalk"
 import { utils } from "ethers"
 import { CommandModule } from "yargs"
-import { formatProperty } from "../format"
-import { fetchMetadata } from "../metadata"
-import { getProvider } from "../provider"
-import { getStageName } from "../stage"
+import { formatProperty } from "../utils/format"
+import { fetchMetadata } from "../utils/metadata"
+import { getProvider } from "../utils/provider"
+import { getStageName } from "../utils/stage"
 import { InsuranceFund, Amm, ClearingHouse } from "../type"
-import { getContract } from "./utils/contract"
+import { getContract } from "../utils/contract"
 
 const ammCommand: CommandModule = {
     command: "amm [<amm>]",
