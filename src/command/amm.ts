@@ -2,35 +2,33 @@ import AmmArtifact from "@perp/contract/build/contracts/src/Amm.sol/Amm.json"
 import InsuranceFundArtifact from "@perp/contract/build/contracts/src/InsuranceFund.sol/InsuranceFund.json"
 import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHouse.sol/ClearingHouse.json"
 import chalk from "chalk"
-import { Fragment, JsonFragment } from "@ethersproject/abi"
-import { Contract, providers, utils } from "ethers"
+import { utils } from "ethers"
 import { CommandModule } from "yargs"
 import { formatProperty } from "../format"
 import { fetchMetadata } from "../metadata"
 import { getProvider } from "../provider"
 import { getStageName } from "../stage"
 import { InsuranceFund, Amm, ClearingHouse } from "../type"
+import { instance } from "./utils/tx"
 
-function instance(
-    address: string,
-    abi: Array<string | Fragment | JsonFragment>,
-    provider: providers.Provider,
-): Contract {
-    return new Contract(address, abi, provider) as Contract
+function isAddress(str: string): boolean {
+    if (!str) return false
+    if (str.startsWith("0x") && str.length == 42) {
+        return true
+    } else if (str.length == 40) {
+        return true
+    }
+    return false
 }
 
 const ammCommand: CommandModule = {
-    command: "amm [<amm_addr>]",
+    command: "amm [<amm>]",
     describe: "show amms' status",
     builder: yargs =>
-        yargs
-            .boolean("short")
-            .alias("short", ["s"])
-            .describe("short", "only list pair/address")
-            .positional("amm_addr", {
-                describe: "amm's address",
-                type: "string",
-            }),
+        yargs.boolean("short").alias("short", ["s"]).describe("short", "only list pair/address").positional("amm", {
+            describe: "amm's address or amm pair, eg. UNI",
+            type: "string",
+        }),
 
     handler: async argv => {
         const stageName = getStageName()
@@ -38,6 +36,8 @@ const ammCommand: CommandModule = {
         const metadata = await fetchMetadata(stageName)
         const layer2Contracts = metadata.layers.layer2.contracts
         const flagShortList = argv.short as boolean
+        const ammArg = argv.amm as string
+        const ammPair = isAddress(ammArg) ? "" : ammArg
 
         const insuranceFund = instance(
             layer2Contracts.InsuranceFund.address,
@@ -52,8 +52,8 @@ const ammCommand: CommandModule = {
         ) as ClearingHouse
 
         let ammAddressList
-        if (argv.amm_addr) {
-            ammAddressList = [argv.amm_addr as string]
+        if (ammArg && !ammPair) {
+            ammAddressList = [ammArg]
         } else {
             ammAddressList = await insuranceFund.getAllAmms()
         }
@@ -61,6 +61,10 @@ const ammCommand: CommandModule = {
         for (const it of ammAddressList) {
             const amm = instance(it, AmmArtifact.abi, provider) as Amm
             const priceFeedKey = utils.parseBytes32String(await amm.priceFeedKey())
+            if (ammPair && ammPair != priceFeedKey) {
+                continue
+            }
+
             const openInterestNotionalCap = await amm.getOpenInterestNotionalCap()
             const openInterestNotional = await clearingHouse.openInterestNotionalMap(it)
             const maxHoldingBaseAsset = await amm.getMaxHoldingBaseAsset()
@@ -107,6 +111,9 @@ const ammCommand: CommandModule = {
                 )
                 console.log(formatProperty("PriceFeed", priceFeedName))
                 console.log("")
+            }
+            if (ammPair && ammPair == priceFeedKey) {
+                break
             }
         }
     },
