@@ -1,8 +1,11 @@
 {
-    "name": "perp-cli",
+    "name": "@perp/cli",
     "version": "0.1.0",
     "description": "CLI for Perpetual Protocol",
     "main": "build/src/index.js",
+    "bin": {
+        "perp": "build/src/index.js"
+    },
     "scripts": {
         "test": "nyc mocha",
         "prebuild": "npm run generate-type",
