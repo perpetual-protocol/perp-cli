@@ -1,5 +1,10 @@
 perp-cli is a CLI for showing information
 
+# Installation
+
+```bash
+$ npm install @perp/cli -g
+```
 # Usage
 
 ## Basic
