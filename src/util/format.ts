@@ -7,6 +7,10 @@ interface Stringify {
     toString(): string
 }
 
+export function formatTitle(title: string) {
+    return chalk.green(title)
+}
+
 export function formatProperty(key: string, value: any) {
     return chalk.yellow(`- ${key}: `) + value
 }

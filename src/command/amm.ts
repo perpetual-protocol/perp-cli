@@ -5,9 +5,9 @@ import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHo
 import chalk from "chalk"
 import { utils } from "ethers"
 import { CommandModule } from "yargs"
-import { formatDecimal, formatProperty } from "../util/format"
-import { fetchMetadata } from "../util/metadata"
-import { getProvider } from "../util/provider"
+import { formatDecimal, formatProperty, formatTitle } from "../util/format"
+import { fetchConfiguration, fetchMetadata } from "../util/metadata"
+import { getProvider, Layer } from "../util/provider"
 import { getStageName } from "../util/stage"
 import { InsuranceFund, Amm, ClearingHouse, TetherToken } from "../type"
 import { getContract } from "../util/contract"
@@ -23,8 +23,9 @@ const ammCommand: CommandModule = {
 
     handler: async argv => {
         const stageName = getStageName()
-        const provider = getProvider()
+        const config = await fetchConfiguration(stageName)
         const metadata = await fetchMetadata(stageName)
+        const provider = getProvider(Layer.Layer2, config)
         const layer2Contracts = metadata.layers.layer2.contracts
         const flagShortList = argv.short as boolean
         const ammArg = argv.amm as string
@@ -92,8 +93,7 @@ const ammCommand: CommandModule = {
             if (flagShortList) {
                 console.log(formatProperty(`${priceFeedKey}/${symbol}`, addr))
             } else {
-                console.log(chalk.green(`${priceFeedKey}/${symbol}`))
-
+                console.log(formatTitle(`${priceFeedKey}/${symbol}`))
                 console.log(formatProperty("Proxy Address", addr))
                 console.log(formatProperty("Index Price", `${formatDecimal(indexPrice)} ${symbol}`))
                 console.log(formatProperty("Market Price", `${formatDecimal(marketPrice)} ${symbol}`))

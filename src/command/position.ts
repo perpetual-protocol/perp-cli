@@ -5,8 +5,8 @@ import { Contract, utils } from "ethers"
 import { CommandModule } from "yargs"
 import { toNumber } from "../util/casting"
 import { formatProperty } from "../util/format"
-import { fetchMetadata } from "../util/metadata"
-import { getProvider } from "../util/provider"
+import { fetchConfiguration, fetchMetadata } from "../util/metadata"
+import { getProvider, Layer } from "../util/provider"
 import { getStageName } from "../util/stage"
 import { Amm, ClearingHouse } from "../type"
 import { getContract } from "../util/contract"
@@ -37,8 +37,9 @@ const positionCommand: CommandModule = {
             }),
     handler: async argv => {
         const stageName = getStageName()
-        const provider = getProvider()
         const metadata = await fetchMetadata(stageName)
+        const config = await fetchConfiguration(stageName)
+        const provider = getProvider(Layer.Layer2, config)
         const clearingHouse = new Contract(
             metadata.layers.layer2.contracts.ClearingHouse.address,
             ClearingHouseArtifact.abi,
