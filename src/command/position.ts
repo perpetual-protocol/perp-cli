@@ -33,7 +33,7 @@ const positionCommand: CommandModule = {
             .option("pair", {
                 alias: "p",
                 type: "string",
-                describe: "filter for pair such as BTCUSDC",
+                describe: "filter for pair such as BTC",
             }),
     handler: async argv => {
         const stageName = getStageName()
@@ -64,8 +64,8 @@ const positionCommand: CommandModule = {
             null,
         )
         const events = await clearingHouse.queryFilter(filter, blockNumber - blockLimit, blockNumber)
-        for (let i = 0; i < events.length; i++) {
-            const event = events[i]
+        let i = 0
+        for (const event of events) {
             const side = event.args.exchangedPositionSize.gt(0) ? "Buy" : "Sell"
             const positionNotional = toNumber(event.args.positionNotional)
             const exchangedPositionSize = toNumber(event.args.exchangedPositionSize)
@@ -80,6 +80,10 @@ const positionCommand: CommandModule = {
                 ammPairMap.set(event.args.amm, pairName)
             }
 
+            if (argv["pair"] && argv["pair"] !== pairName) {
+                continue
+            }
+
             console.log(chalk.green(`PositionChanged event #${i + 1}`))
             console.log(formatProperty("trader", event.args.trader))
             console.log(formatProperty("asset", pairName))
@@ -88,6 +92,7 @@ const positionCommand: CommandModule = {
             console.log(formatProperty("size", exchangedPositionSize))
             console.log(formatProperty("tx", event.transactionHash))
             console.log("")
+            i++
         }
     },
 }
