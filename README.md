@@ -11,7 +11,7 @@ $ npm install @perp/cli -g
 
 ```shell
 # List position history
-$ perp position [--trader=<trader_address>] [--pair=<pair>] [--block-limit=<block_limit>]
+$ perp position [--trader <trader_address>] [--pair <pair>] [--block-limit <block_limit>]
 
 # show portfolio
 $ perp portfolio <trader_address>
@@ -22,7 +22,7 @@ $ perp amm [<amm_address>] [--short] //--short option provides a brief summary
 
 ## Advanced (Not available yet)
 
-Use `PERP_MNEMONIC=<mnemonic>` to set a private key. Then you can use `perp exec` to execute transactions with an execution file.
+Use `export PERP_MNEMONIC=<mnemonic>` to set a private key. Then you can use `perp exec` to execute transactions with an execution file.
 
 ```shell
 $ perp exec <filename>
