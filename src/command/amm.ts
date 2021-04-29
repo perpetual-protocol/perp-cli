@@ -11,16 +11,6 @@ import { getStageName } from "../stage"
 import { InsuranceFund, Amm, ClearingHouse } from "../type"
 import { getContract } from "./utils/contract"
 
-function isAddress(str: string): boolean {
-    if (!str) return false
-    if (str.startsWith("0x") && str.length == 42) {
-        return true
-    } else if (str.length == 40) {
-        return true
-    }
-    return false
-}
-
 const ammCommand: CommandModule = {
     command: "amm [<amm>]",
     describe: "show amms' status",
@@ -37,7 +27,7 @@ const ammCommand: CommandModule = {
         const layer2Contracts = metadata.layers.layer2.contracts
         const flagShortList = argv.short as boolean
         const ammArg = argv.amm as string
-        const ammPair = isAddress(ammArg) ? "" : ammArg
+        const ammPair = utils.isAddress(ammArg) ? "" : ammArg
 
         const insuranceFund = getContract<InsuranceFund>(
             layer2Contracts.InsuranceFund.address,

@@ -1,8 +1,19 @@
 {
-    "cSpell.words": ["perp", "typechain"],
+    "cSpell.words": [
+        "BTCUSDC",
+        "Chainlink",
+        "TWAP",
+        "amm's",
+        "amms",
+        "ethersproject",
+        "perp",
+        "typechain",
+        "xdai"
+    ],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": false,
     "[typescript]": {
         "editor.formatOnSave": true
-    }
+    },
+    "cSpell.enabled": true
 }
