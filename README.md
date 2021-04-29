@@ -1,5 +1,10 @@
 perp-cli is a CLI for showing information
 
+# Installation
+
+```bash
+$ npm install @perp/cli -g
+```
 # Usage
 
 ## Basic
@@ -13,12 +18,9 @@ $ perp portfolio <trader_address>
 
 # show amm information
 $ perp amm [<amm_address>] [--short]
-
-# switch to staging environment
-$ perp amm [--stage production|staging]
 ```
 
-## Advanced
+## Advanced (Not available yet)
 
 use `PERP_MNEMONIC=<mnemonic>` to set a private key for manipulation, then you can use `perp exec` to execute transactions with an execution file.
 

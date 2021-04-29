@@ -1,3 +1,4 @@
+import TetherTokenArtifact from "@perp/contract/build/contracts/src/mock/TetherToken.sol/TetherToken.json"
 import AmmArtifact from "@perp/contract/build/contracts/src/Amm.sol/Amm.json"
 import InsuranceFundArtifact from "@perp/contract/build/contracts/src/InsuranceFund.sol/InsuranceFund.json"
 import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHouse.sol/ClearingHouse.json"
@@ -5,15 +6,15 @@ import ClearingHouseViewerArtifact from "@perp/contract/build/contracts/src/Clea
 import chalk from "chalk"
 import { utils } from "ethers"
 import { CommandModule } from "yargs"
-import { formatProperty } from "../util/format"
-import { fetchMetadata } from "../util/metadata"
-import { getProvider } from "../util/provider"
+import { formatProperty, formatTitle } from "../util/format"
+import { fetchConfiguration, fetchMetadata } from "../util/metadata"
+import { getProvider, Layer } from "../util/provider"
 import { getStageName } from "../util/stage"
-import { InsuranceFund, Amm, ClearingHouse, ClearingHouseViewer } from "../type"
+import { InsuranceFund, Amm, ClearingHouse, ClearingHouseViewer, TetherToken } from "../type"
 import { getLiquidationPrice } from "../util/calculation"
 import { ONE_ETH } from "../util/dataTypes"
 import { PnlCalcOption, MAINTENANCE_MARGIN_RATIO } from "../util/constant"
-import { getContract } from "../util/contract"
+import { balanceOf, getContract } from "../util/contract"
 
 const portfolioCommand: CommandModule = {
     command: "portfolio <trader_addr>",
@@ -26,28 +27,51 @@ const portfolioCommand: CommandModule = {
 
     handler: async argv => {
         const stageName = getStageName()
-        const provider = getProvider()
         const metadata = await fetchMetadata(stageName)
+        const config = await fetchConfiguration(stageName)
+        const layer2provider = getProvider(Layer.Layer2, config)
+        const layer1provider = getProvider(Layer.Layer1, config)
         const layer2Contracts = metadata.layers.layer2.contracts
+        const layer1Contracts = metadata.layers.layer1.contracts
         const trader = argv.trader_addr as string
+
+        const layer1Usdc = getContract<TetherToken>(
+            metadata.layers.layer1.externalContracts.usdc,
+            TetherTokenArtifact.abi,
+            layer1provider,
+        )
+        const layer2Usdc = getContract<TetherToken>(
+            metadata.layers.layer2.externalContracts.usdc,
+            TetherTokenArtifact.abi,
+            layer2provider,
+        )
 
         const insuranceFund = getContract<InsuranceFund>(
             layer2Contracts.InsuranceFund.address,
             InsuranceFundArtifact.abi,
-            provider,
+            layer2provider,
         )
 
         const clearingHouse = getContract<ClearingHouse>(
             layer2Contracts.ClearingHouse.address,
             ClearingHouseArtifact.abi,
-            provider,
+            layer2provider,
         )
 
         const clearingHouseViewer = getContract<ClearingHouseViewer>(
             layer2Contracts.ClearingHouseViewer.address,
             ClearingHouseViewerArtifact.abi,
-            provider,
+            layer2provider,
         )
+
+        const layer1Balance = await balanceOf(trader, layer1Usdc)
+        const layer2Balance = await balanceOf(trader, layer2Usdc)
+        const symbol = await layer1Usdc.symbol()
+
+        console.log(formatTitle("Balances"))
+        console.log(formatProperty("layer1", `${layer1Balance} ${symbol}`))
+        console.log(formatProperty("layer2", `${layer2Balance} ${symbol}`))
+        console.log("")
 
         const ammAddressList = await insuranceFund.getAllAmms()
         for (const addr of ammAddressList) {
@@ -55,7 +79,7 @@ const portfolioCommand: CommandModule = {
             if (pos.size.d.isZero()) {
                 continue
             }
-            const amm = getContract<Amm>(addr, AmmArtifact.abi, provider)
+            const amm = getContract<Amm>(addr, AmmArtifact.abi, layer2provider)
             const priceFeedKey = utils.parseBytes32String(await amm.priceFeedKey())
             const marginRatio = await clearingHouseViewer.getMarginRatio(addr, trader)
             const quote = await amm.quoteAssetReserve()
@@ -78,7 +102,7 @@ const portfolioCommand: CommandModule = {
                 k,
             )
 
-            console.log(chalk.green(`${priceFeedKey}/USDC`))
+            console.log(formatTitle(`${priceFeedKey}/${symbol}`))
             console.log(formatProperty("position size", utils.formatEther(pos.size.d)))
             console.log(formatProperty("margin (with funding payment)", utils.formatEther(pos.margin.d)))
             console.log(formatProperty("margin ratio", utils.formatEther(marginRatio.d.mul("100")) + " %"))

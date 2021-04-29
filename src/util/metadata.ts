@@ -29,7 +29,23 @@ export interface Layers {
 export interface Metadata {
     layers: Layers
 }
+export interface EndPoint {
+    type: string
+    name: string
+    url: string
+}
+
+export interface Configuration {
+    L1_WEB3_ENDPOINTS: EndPoint[]
+    L2_WEB3_ENDPOINTS: EndPoint[]
+}
 
 export function fetchMetadata(stageName: StageName): Promise<Metadata> {
     return fetch(`https://metadata.perp.exchange/${stageName}.json`).then(res => res.json()) as Promise<Metadata>
+}
+
+export function fetchConfiguration(stageName: StageName): Promise<Configuration> {
+    return fetch(`https://metadata.perp.exchange/config.${stageName}.json`).then(res =>
+        res.json(),
+    ) as Promise<Configuration>
 }
