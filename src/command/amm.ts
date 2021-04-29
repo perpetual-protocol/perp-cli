@@ -4,12 +4,12 @@ import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHo
 import chalk from "chalk"
 import { utils } from "ethers"
 import { CommandModule } from "yargs"
-import { formatProperty } from "../utils/format"
-import { fetchMetadata } from "../utils/metadata"
-import { getProvider } from "../utils/provider"
-import { getStageName } from "../utils/stage"
+import { formatDecimal, formatProperty } from "../util/format"
+import { fetchMetadata } from "../util/metadata"
+import { getProvider } from "../util/provider"
+import { getStageName } from "../util/stage"
 import { InsuranceFund, Amm, ClearingHouse } from "../type"
-import { getContract } from "../utils/contract"
+import { getContract } from "../util/contract"
 
 const ammCommand: CommandModule = {
     command: "amm [<amm>]",
@@ -80,24 +80,14 @@ const ammCommand: CommandModule = {
                 console.log(chalk.green(`${priceFeedKey}/USDC`))
 
                 console.log(formatProperty("Proxy Address", addr))
+                console.log(formatProperty("OpenInterestNotionalCap", formatDecimal(openInterestNotionalCap)) + " USDC")
+                console.log(formatProperty("OpenInterestNotional", formatDecimal(openInterestNotional)) + " USDC")
                 console.log(
-                    formatProperty("OpenInterestNotionalCap", utils.formatEther(openInterestNotionalCap.toString())) +
-                        " USDC",
+                    formatProperty("MaxHoldingBaseAsset", formatDecimal(maxHoldingBaseAsset)) + ` ${priceFeedKey}`,
                 )
+                console.log(formatProperty("QuoteAssetReserve", formatDecimal(quoteAssetReserve)) + " USDC")
                 console.log(
-                    formatProperty("OpenInterestNotional", utils.formatEther(openInterestNotional.toString())) +
-                        " USDC",
-                )
-                console.log(
-                    formatProperty("MaxHoldingBaseAsset", utils.formatEther(maxHoldingBaseAsset.toString())) +
-                        ` ${priceFeedKey}`,
-                )
-                console.log(
-                    formatProperty("QuoteAssetReserve", utils.formatEther(quoteAssetReserve.toString())) + " USDC",
-                )
-                console.log(
-                    formatProperty("BaseAssetReserve", utils.formatEther(baseAssetReserve.toString())) +
-                        ` ${priceFeedKey}USDC`,
+                    formatProperty("BaseAssetReserve", formatDecimal(baseAssetReserve)) + ` ${priceFeedKey}USDC`,
                 )
                 console.log(formatProperty("PriceFeed", priceFeedName))
                 console.log("")

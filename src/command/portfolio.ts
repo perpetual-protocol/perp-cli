@@ -5,15 +5,15 @@ import ClearingHouseViewerArtifact from "@perp/contract/build/contracts/src/Clea
 import chalk from "chalk"
 import { utils } from "ethers"
 import { CommandModule } from "yargs"
-import { formatProperty } from "../utils/format"
-import { fetchMetadata } from "../utils/metadata"
-import { getProvider } from "../utils/provider"
-import { getStageName } from "../utils/stage"
+import { formatProperty } from "../util/format"
+import { fetchMetadata } from "../util/metadata"
+import { getProvider } from "../util/provider"
+import { getStageName } from "../util/stage"
 import { InsuranceFund, Amm, ClearingHouse, ClearingHouseViewer } from "../type"
-import { getLiquidationPrice } from "../utils/calculation"
-import { ONE_ETH } from "../utils/dataTypes"
-import { PnlCalcOption, MAINTENANCE_MARGIN_RATIO } from "../utils/constant"
-import { getContract } from "../utils/contract"
+import { getLiquidationPrice } from "../util/calculation"
+import { ONE_ETH } from "../util/dataTypes"
+import { PnlCalcOption, MAINTENANCE_MARGIN_RATIO } from "../util/constant"
+import { getContract } from "../util/contract"
 
 const portfolioCommand: CommandModule = {
     command: "portfolio <trader_addr>",
