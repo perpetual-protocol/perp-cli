@@ -9,7 +9,7 @@ import { fetchMetadata } from "../metadata"
 import { getProvider } from "../provider"
 import { getStageName } from "../stage"
 import { InsuranceFund, Amm, ClearingHouse } from "../type"
-import { instance } from "./utils/tx"
+import { getContract } from "./utils/contract"
 
 function isAddress(str: string): boolean {
     if (!str) return false
@@ -39,17 +39,17 @@ const ammCommand: CommandModule = {
         const ammArg = argv.amm as string
         const ammPair = isAddress(ammArg) ? "" : ammArg
 
-        const insuranceFund = instance(
+        const insuranceFund = getContract<InsuranceFund>(
             layer2Contracts.InsuranceFund.address,
             InsuranceFundArtifact.abi,
             provider,
-        ) as InsuranceFund
+        )
 
-        const clearingHouse = instance(
+        const clearingHouse = getContract<ClearingHouse>(
             layer2Contracts.ClearingHouse.address,
             ClearingHouseArtifact.abi,
             provider,
-        ) as ClearingHouse
+        )
 
         let ammAddressList
         if (ammArg && !ammPair) {
@@ -58,15 +58,15 @@ const ammCommand: CommandModule = {
             ammAddressList = await insuranceFund.getAllAmms()
         }
 
-        for (const it of ammAddressList) {
-            const amm = instance(it, AmmArtifact.abi, provider) as Amm
+        for (const addr of ammAddressList) {
+            const amm = getContract<Amm>(addr, AmmArtifact.abi, provider)
             const priceFeedKey = utils.parseBytes32String(await amm.priceFeedKey())
             if (ammPair && ammPair != priceFeedKey) {
                 continue
             }
 
             const openInterestNotionalCap = await amm.getOpenInterestNotionalCap()
-            const openInterestNotional = await clearingHouse.openInterestNotionalMap(it)
+            const openInterestNotional = await clearingHouse.openInterestNotionalMap(addr)
             const maxHoldingBaseAsset = await amm.getMaxHoldingBaseAsset()
             const reserve = await amm.getReserve()
             const quoteAssetReserve = reserve[0]
@@ -85,11 +85,11 @@ const ammCommand: CommandModule = {
             }
 
             if (flagShortList) {
-                console.log(formatProperty(`${priceFeedKey}/USDC`, it))
+                console.log(formatProperty(`${priceFeedKey}/USDC`, addr))
             } else {
                 console.log(chalk.green(`${priceFeedKey}/USDC`))
 
-                console.log(formatProperty("Proxy Address", it))
+                console.log(formatProperty("Proxy Address", addr))
                 console.log(
                     formatProperty("OpenInterestNotionalCap", utils.formatEther(openInterestNotionalCap.toString())) +
                         " USDC",

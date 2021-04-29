@@ -1,10 +1,10 @@
 import { Fragment, JsonFragment } from "@ethersproject/abi"
 import { Contract, providers } from "ethers"
 
-export function instance(
+export function getContract<T>(
     address: string,
     abi: Array<string | Fragment | JsonFragment>,
     provider: providers.Provider,
-): Contract {
-    return new Contract(address, abi, provider) as Contract
+): T {
+    return (new Contract(address, abi, provider) as unknown) as T
 }
