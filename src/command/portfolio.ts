@@ -5,15 +5,15 @@ import ClearingHouseViewerArtifact from "@perp/contract/build/contracts/src/Clea
 import chalk from "chalk"
 import { utils } from "ethers"
 import { CommandModule } from "yargs"
-import { formatProperty } from "../format"
-import { fetchMetadata } from "../metadata"
-import { getProvider } from "../provider"
-import { getStageName } from "../stage"
+import { formatProperty } from "../util/format"
+import { fetchMetadata } from "../util/metadata"
+import { getProvider } from "../util/provider"
+import { getStageName } from "../util/stage"
 import { InsuranceFund, Amm, ClearingHouse, ClearingHouseViewer } from "../type"
-import { getLiquidationPrice } from "./utils/calculation"
-import { ONE_ETH } from "./utils/dataTypes"
-import { PnlCalcOption, MAINTENANCE_MARGIN_RATIO } from "./utils/constant"
-import { instance } from "./utils/tx"
+import { getLiquidationPrice } from "../util/calculation"
+import { ONE_ETH } from "../util/dataTypes"
+import { PnlCalcOption, MAINTENANCE_MARGIN_RATIO } from "../util/constant"
+import { getContract } from "../util/contract"
 
 const portfolioCommand: CommandModule = {
     command: "portfolio <trader_addr>",
@@ -31,38 +31,38 @@ const portfolioCommand: CommandModule = {
         const layer2Contracts = metadata.layers.layer2.contracts
         const trader = argv.trader_addr as string
 
-        const insuranceFund = instance(
+        const insuranceFund = getContract<InsuranceFund>(
             layer2Contracts.InsuranceFund.address,
             InsuranceFundArtifact.abi,
             provider,
-        ) as InsuranceFund
+        )
 
-        const clearingHouse = instance(
+        const clearingHouse = getContract<ClearingHouse>(
             layer2Contracts.ClearingHouse.address,
             ClearingHouseArtifact.abi,
             provider,
-        ) as ClearingHouse
+        )
 
-        const clearingHouseViewer = instance(
+        const clearingHouseViewer = getContract<ClearingHouseViewer>(
             layer2Contracts.ClearingHouseViewer.address,
             ClearingHouseViewerArtifact.abi,
             provider,
-        ) as ClearingHouseViewer
+        )
 
         const ammAddressList = await insuranceFund.getAllAmms()
-        for (const it of ammAddressList) {
-            const pos = await clearingHouseViewer.getPersonalPositionWithFundingPayment(it, trader)
+        for (const addr of ammAddressList) {
+            const pos = await clearingHouseViewer.getPersonalPositionWithFundingPayment(addr, trader)
             if (pos.size.d.isZero()) {
                 continue
             }
-            const amm = instance(it, AmmArtifact.abi, provider) as Amm
+            const amm = getContract<Amm>(addr, AmmArtifact.abi, provider)
             const priceFeedKey = utils.parseBytes32String(await amm.priceFeedKey())
-            const marginRatio = await clearingHouseViewer.getMarginRatio(it, trader)
+            const marginRatio = await clearingHouseViewer.getMarginRatio(addr, trader)
             const quote = await amm.quoteAssetReserve()
             const base = await amm.baseAssetReserve()
             const k = quote.mul(base).div(ONE_ETH)
             const posNotionalNPnl = await clearingHouse.getPositionNotionalAndUnrealizedPnl(
-                it,
+                addr,
                 trader,
                 PnlCalcOption.SPOT_PRICE,
             )

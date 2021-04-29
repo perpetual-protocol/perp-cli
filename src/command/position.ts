@@ -2,11 +2,11 @@ import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHo
 import chalk from "chalk"
 import { Contract } from "ethers"
 import { CommandModule } from "yargs"
-import { toNumber } from "../casting"
-import { formatProperty } from "../format"
-import { fetchMetadata } from "../metadata"
-import { getProvider } from "../provider"
-import { getStageName } from "../stage"
+import { toNumber } from "../util/casting"
+import { formatProperty } from "../util/format"
+import { fetchMetadata } from "../util/metadata"
+import { getProvider } from "../util/provider"
+import { getStageName } from "../util/stage"
 import { ClearingHouse } from "../type"
 
 const DEFAULT_BLOCK_LIMIT = 10
