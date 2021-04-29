@@ -1,4 +1,5 @@
 import AmmArtifact from "@perp/contract/build/contracts/src/Amm.sol/Amm.json"
+import TetherTokenArtifact from "@perp/contract/build/contracts/src/mock/TetherToken.sol/TetherToken.json"
 import InsuranceFundArtifact from "@perp/contract/build/contracts/src/InsuranceFund.sol/InsuranceFund.json"
 import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHouse.sol/ClearingHouse.json"
 import chalk from "chalk"
@@ -8,7 +9,7 @@ import { formatDecimal, formatProperty } from "../util/format"
 import { fetchMetadata } from "../util/metadata"
 import { getProvider } from "../util/provider"
 import { getStageName } from "../util/stage"
-import { InsuranceFund, Amm, ClearingHouse } from "../type"
+import { InsuranceFund, Amm, ClearingHouse, TetherToken } from "../type"
 import { getContract } from "../util/contract"
 
 const ammCommand: CommandModule = {
@@ -28,6 +29,7 @@ const ammCommand: CommandModule = {
         const flagShortList = argv.short as boolean
         const ammArg = argv.amm as string
         const ammPair = utils.isAddress(ammArg) ? "" : ammArg
+        const tokenSymbolMap = new Map<string, string>()
 
         const insuranceFund = getContract<InsuranceFund>(
             layer2Contracts.InsuranceFund.address,
@@ -58,10 +60,23 @@ const ammCommand: CommandModule = {
             const openInterestNotionalCap = await amm.getOpenInterestNotionalCap()
             const openInterestNotional = await clearingHouse.openInterestNotionalMap(addr)
             const maxHoldingBaseAsset = await amm.getMaxHoldingBaseAsset()
+            const indexPrice = await amm.getUnderlyingPrice()
+            const marketPrice = await amm.getSpotPrice()
             const reserve = await amm.getReserve()
+            const quoteAssetAddress = await amm.quoteAsset()
             const quoteAssetReserve = reserve[0]
             const baseAssetReserve = reserve[1]
             const priceFeed = await amm.priceFeed()
+            let symbol = ""
+
+            if (!tokenSymbolMap.has(quoteAssetAddress)) {
+                const token = getContract<TetherToken>(quoteAssetAddress, TetherTokenArtifact.abi, provider)
+                symbol = await token.symbol()
+                tokenSymbolMap.set(quoteAssetAddress, symbol)
+            } else {
+                symbol = tokenSymbolMap.get(quoteAssetAddress) || ""
+            }
+
             let priceFeedName = ""
 
             if (priceFeed === layer2Contracts.L2PriceFeed.address) {
@@ -75,19 +90,23 @@ const ammCommand: CommandModule = {
             }
 
             if (flagShortList) {
-                console.log(formatProperty(`${priceFeedKey}/USDC`, addr))
+                console.log(formatProperty(`${priceFeedKey}/${symbol}`, addr))
             } else {
-                console.log(chalk.green(`${priceFeedKey}/USDC`))
+                console.log(chalk.green(`${priceFeedKey}/${symbol}`))
 
                 console.log(formatProperty("Proxy Address", addr))
-                console.log(formatProperty("OpenInterestNotionalCap", formatDecimal(openInterestNotionalCap)) + " USDC")
-                console.log(formatProperty("OpenInterestNotional", formatDecimal(openInterestNotional)) + " USDC")
+                console.log(formatProperty("Index Price", `${formatDecimal(indexPrice)} ${symbol}`))
+                console.log(formatProperty("Market Price", `${formatDecimal(marketPrice)} ${symbol}`))
                 console.log(
-                    formatProperty("MaxHoldingBaseAsset", formatDecimal(maxHoldingBaseAsset)) + ` ${priceFeedKey}`,
+                    formatProperty("OpenInterestNotionalCap", `${formatDecimal(openInterestNotionalCap)} ${symbol}`),
                 )
-                console.log(formatProperty("QuoteAssetReserve", formatDecimal(quoteAssetReserve)) + " USDC")
+                console.log(formatProperty("OpenInterestNotional", `${formatDecimal(openInterestNotional)} ${symbol}`))
                 console.log(
-                    formatProperty("BaseAssetReserve", formatDecimal(baseAssetReserve)) + ` ${priceFeedKey}USDC`,
+                    formatProperty("MaxHoldingBaseAsset", `${formatDecimal(maxHoldingBaseAsset)} ${priceFeedKey}`),
+                )
+                console.log(formatProperty("QuoteAssetReserve", `${formatDecimal(quoteAssetReserve)} ${symbol}`))
+                console.log(
+                    formatProperty("BaseAssetReserve", formatDecimal(baseAssetReserve)) + ` ${priceFeedKey}${symbol}`,
                 )
                 console.log(formatProperty("PriceFeed", priceFeedName))
                 console.log("")
