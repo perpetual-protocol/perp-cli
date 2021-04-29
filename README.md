@@ -37,7 +37,7 @@ For example, if you want to open a long position for BTC, the execution file wil
     side: 0|1 // Indicates a long position
     quoteAssetAmount: 1000
     leverage: 2
-    baseAssetAmountLimit: 100 // Set to control slippage
+    baseAssetAmountLimit: 100 // Set min. position size here to control slippage
 ```
 
 # Development
