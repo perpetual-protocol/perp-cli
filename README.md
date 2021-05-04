@@ -18,6 +18,10 @@ $ perp portfolio <trader_address>
 
 # show amm information
 $ perp amm [<amm_address>] [--short] //--short option provides a brief summary
+
+# decode and verify function data with certain contract address
+$ perp verify 0x33FbaeFb2dCc3B7e0B80afbB4377C2EB64AF0a3A \
+    0x0dd68c7000000000000000000000000000000000000000000000000ad78ebc5ac6200000000000000000000000000000000000000000000000034f086f3b33b684000000
 ```
 
 ## Advanced (Not available yet)

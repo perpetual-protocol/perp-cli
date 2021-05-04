@@ -5,6 +5,7 @@ import { hideBin } from "yargs/helpers"
 import positionHistory from "./command/position"
 import ammStatus from "./command/amm"
 import portfolio from "./command/portfolio"
+import verifyCommand from "./command/verify"
 
 const SCRIPT_NAME = "perp"
 
@@ -13,6 +14,7 @@ yargs(hideBin(process.argv))
     .command(positionHistory)
     .command(ammStatus)
     .command(portfolio)
+    .command(verifyCommand)
     .onFinishCommand(_ => {
         process.exit(0)
     })
