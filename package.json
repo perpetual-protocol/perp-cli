@@ -22,6 +22,7 @@
         "@types/mocha": "8.2.2",
         "@types/node": "14.14.41",
         "@types/node-fetch": "2.5.10",
+        "@types/shelljs": "0.8.8",
         "@types/yargs": "16.0.1",
         "chai": "4.3.4",
         "mocha": "8.3.2",
@@ -32,11 +33,12 @@
         "typescript": "4.2.4"
     },
     "dependencies": {
-        "@perp/contract": "2.1.0",
+        "@perp/contract": "2.2.0",
         "big.js": "5.2.2",
         "chalk": "2.4.2",
         "ethers": "5.1.3",
         "node-fetch": "2.6.1",
+        "shelljs": "0.8.4",
         "yargs": "16.2.0"
     }
 }

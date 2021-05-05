@@ -18,3 +18,20 @@ export function formatProperty(key: string, value: any) {
 export function formatDecimal(num: Stringify, decimals = DEFAULT_DECIMALS): string {
     return utils.formatUnits(num.toString(), decimals)
 }
+
+export function formatBigNumber(num: BigNumber): string {
+    return `${num.toString()} (${formatDecimal(num)})`
+}
+
+export function formatArray(inArray: any[]): any[] {
+    const outArray: any[] = []
+    for (const arg of inArray) {
+        if (Array.isArray(arg)) {
+            outArray.push(formatArray(arg))
+        } else if (BigNumber.isBigNumber(arg)) {
+            outArray.push(formatBigNumber(arg))
+        }
+    }
+
+    return outArray
+}
