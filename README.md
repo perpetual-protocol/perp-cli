@@ -12,9 +12,13 @@ $ npm install @perp/cli -g
 ### List position history
 
 ```shell
-$ perp position [--trader <trader_address>] [--pair <pair>] [--block-limit <block_limit>]
+$ perp position [-t --trader <trader_address>] [-p --pair <pair>] [-b --block-limit <number_of_blocks>]
 ```
-execute `perp position` without argument will print:
+Pass `--block-limit` to increase the number of blocks included in the query. E.g. `--block-limit 100`.
+
+**Example**
+
+Executing `perp position` without argument will print events from the latest blocks:
 ```shell
 $ perp position
 
@@ -37,7 +41,7 @@ PositionChanged event #2
 ...
 ```
 
-use `--pair` can filter by pair name:
+Use `--pair` to filter by pair name:
 
 ```shell
 $ perp position --pair SUSHI
@@ -56,7 +60,7 @@ PositionChanged event #1
 $ perp portfolio <trader_address>
 ```
 
-Example: 
+**Example**
 
 ```shell
 $ perp portfolio 0x3F84E391EA8dc12946e17d1d85cdf0B35D4fE650
@@ -87,15 +91,15 @@ PERP/USDC
 - last open at block: 15310098
 ...
 ```
-### show amm information
+### Show AMM information
 
 ```
-$ perp amm [<amm_address>] [--short] //--short option provides a brief summary
+$ perp amm [<amm_address>] [--short] # --short option prints AMM addresses only
 ```
 
-Example:
+**Example**
 ```shell
-$ perp amm # print all AMM
+$ perp amm # print all AMMs
 
 # output
 ETH/USDC
@@ -153,13 +157,13 @@ UNI/USDC
 
 ```
 
-### verify function data
+### Verify function data
 
 ```shell
 $ perp verify <contract_address> <byte_code>
 ```
 
-example:
+**Example**
 ```shell
 $ perp verify 0x33FbaeFb2dCc3B7e0B80afbB4377C2EB64AF0a3A 0x0dd68c7000000000000000000000000000000000000000000000000ad78ebc5ac6200000000000000000000000000000000000000000000000034f086f3b33b684000000
 
