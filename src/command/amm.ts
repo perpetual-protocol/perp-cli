@@ -22,7 +22,7 @@ const ammCommand: CommandModule = {
         }),
 
     handler: async argv => {
-        const stageName = getStageName()
+        const stageName = getStageName(argv.stage)
         const config = await fetchConfiguration(stageName)
         const metadata = await fetchMetadata(stageName)
         const provider = getProvider(Layer.Layer2, config)

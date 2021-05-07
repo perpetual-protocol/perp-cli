@@ -6,7 +6,7 @@ export enum StageName {
 export class Stage {
     readonly name: StageName
 
-    constructor(stageName?: string) {
+    constructor(stageName: unknown) {
         switch (stageName) {
             case StageName.Production:
             case StageName.Staging:
@@ -20,6 +20,6 @@ export class Stage {
     }
 }
 
-export function getStageName(): StageName {
-    return new Stage(process.env.PERP_STAGE).name
+export function getStageName(strStage: unknown): StageName {
+    return new Stage(strStage).name
 }
