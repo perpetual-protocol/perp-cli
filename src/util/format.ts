@@ -16,7 +16,8 @@ export function formatProperty(key: string, value: any) {
 }
 
 export function formatDecimal(num: Stringify, decimals = DEFAULT_DECIMALS): string {
-    return utils.formatUnits(num.toString(), decimals)
+    const value = Number.parseFloat(utils.formatUnits(num.toString(), decimals))
+    return Intl.NumberFormat("en-US").format(value)
 }
 
 export function formatBigNumber(num: BigNumber): string {
