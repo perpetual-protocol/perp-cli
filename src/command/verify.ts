@@ -54,7 +54,7 @@ const verifyCommand: CommandModule = {
     handler: async argv => {
         const address = argv.address as string
         const data = argv.data as string
-        const stageName = getStageName()
+        const stageName = getStageName(argv.stage)
         const config = await fetchConfiguration(stageName)
         const metadata = await fetchMetadata(stageName)
         const layer = argv.layer === 2 ? Layer.Layer2 : Layer.Layer1

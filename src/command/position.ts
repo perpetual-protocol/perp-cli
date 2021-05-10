@@ -36,7 +36,7 @@ const positionCommand: CommandModule = {
                 describe: "filter for pair such as BTC",
             }),
     handler: async argv => {
-        const stageName = getStageName()
+        const stageName = getStageName(argv.stage)
         const metadata = await fetchMetadata(stageName)
         const config = await fetchConfiguration(stageName)
         const provider = getProvider(Layer.Layer2, config)

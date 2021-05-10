@@ -11,6 +11,10 @@ const SCRIPT_NAME = "perp"
 
 yargs(hideBin(process.argv))
     .scriptName(SCRIPT_NAME)
+    .option("stage", {
+        type: "string",
+        default: "production",
+    })
     .command(positionHistory)
     .command(ammStatus)
     .command(portfolio)
