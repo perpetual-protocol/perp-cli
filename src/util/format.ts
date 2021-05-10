@@ -30,6 +30,8 @@ export function formatArray(inArray: any[]): any[] {
             outArray.push(formatArray(arg))
         } else if (BigNumber.isBigNumber(arg)) {
             outArray.push(formatBigNumber(arg))
+        } else {
+            outArray.push(arg)
         }
     }
 
