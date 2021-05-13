@@ -94,7 +94,7 @@ PERP/USDC
 ### Show AMM information
 
 ```
-$ perp amm [<amm_address>] [--short] # --short option prints AMM addresses only
+$ perp amm [<amm_address> | <amm_pair>] [--short] # --short option prints AMM addresses only
 ```
 
 **Example**

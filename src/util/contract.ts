@@ -1,11 +1,13 @@
 import { Fragment, JsonFragment } from "@ethersproject/abi"
-import { Contract, providers, utils } from "ethers"
+import { Provider } from "@ethersproject/providers"
+import { Contract, utils } from "ethers"
 import { TetherToken } from "../type"
+import { Signer } from "@ethersproject/abstract-signer"
 
 export function getContract<T>(
     address: string,
     abi: Array<string | Fragment | JsonFragment>,
-    provider: providers.Provider,
+    provider: Provider | Signer,
 ): T {
     return (new Contract(address, abi, provider) as unknown) as T
 }
