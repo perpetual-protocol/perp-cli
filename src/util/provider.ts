@@ -6,6 +6,12 @@ export enum Layer {
     Layer2 = "layer2",
 }
 
+export enum NetworkName {
+    Homestead = "homestead",
+    Rinkeby = "rinkeby",
+    Xdai = "xdai",
+}
+
 export function getProvider(layer: Layer, config: Configuration): providers.Provider {
     if (layer === Layer.Layer1 && config.L1_WEB3_ENDPOINTS.length > 0) {
         return new providers.WebSocketProvider(config.L1_WEB3_ENDPOINTS[0].url)
