@@ -3,6 +3,11 @@
   args:
     amm: "0xF75C8c9EADBCA5D26dA43466aD5Be511Cb281668"
     side: 1
-    quoteAssetAmount: 10
+    quoteAssetAmount: 10.2
     leverage: 2
     baseAssetAmountLimit: 0
+
+
+
+
+
