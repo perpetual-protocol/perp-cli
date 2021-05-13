@@ -6,10 +6,11 @@ import { CommandModule } from "yargs"
 import { toNumber } from "../util/casting"
 import { formatProperty } from "../util/format"
 import { fetchConfiguration, fetchMetadata } from "../util/metadata"
-import { getProvider, Layer } from "../util/provider"
+import { getProvider, Layer, NetworkName } from "../util/provider"
 import { getStageName } from "../util/stage"
 import { Amm, ClearingHouse } from "../type"
 import { getContract } from "../util/contract"
+import { getEstimatedBlockTimestamp, timestamp2DateStr } from "../util/time"
 
 const DEFAULT_BLOCK_LIMIT = 10
 
@@ -34,6 +35,11 @@ const positionCommand: CommandModule = {
                 alias: "p",
                 type: "string",
                 describe: "filter for pair such as BTC",
+            })
+            .option("liquidated", {
+                alias: "l",
+                type: "boolean",
+                describe: "filter for liquidated positions",
             }),
     handler: async argv => {
         const stageName = getStageName(argv.stage)
@@ -71,6 +77,13 @@ const positionCommand: CommandModule = {
             const positionNotional = toNumber(event.args.positionNotional)
             const exchangedPositionSize = toNumber(event.args.exchangedPositionSize)
             const price = Math.abs(positionNotional / exchangedPositionSize)
+            const timestamp = getEstimatedBlockTimestamp(
+                metadata.layers.layer2.network as NetworkName,
+                blockNumber,
+                Date.now() / 1000,
+                event.blockNumber!,
+            )
+
             let pairName = ""
 
             if (ammPairMap.has(event.args.amm)) {
@@ -85,7 +98,12 @@ const positionCommand: CommandModule = {
                 continue
             }
 
+            if (argv["liquidated"] && event.args.liquidationPenalty.eq(0)) {
+                continue
+            }
+
             console.log(chalk.green(`PositionChanged event #${i + 1}`))
+            console.log(formatProperty("estimated time", timestamp2DateStr(timestamp)))
             console.log(formatProperty("trader", event.args.trader))
             console.log(formatProperty("asset", pairName))
             console.log(formatProperty("side", side))
