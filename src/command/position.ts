@@ -13,6 +13,7 @@ import { getContract } from "../util/contract"
 import { getEstimatedBlockTimestamp, timestamp2DateStr } from "../util/time"
 
 const DEFAULT_BLOCK_LIMIT = 10
+const DEFAULT_FILTER_VALUE = 10
 
 const positionCommand: CommandModule = {
     command: "position",
@@ -40,6 +41,12 @@ const positionCommand: CommandModule = {
                 alias: "l",
                 type: "boolean",
                 describe: "filter for liquidated positions",
+            })
+            .option("greater-than", {
+                alias: "gt",
+                type: "number",
+                describe: " only show value great than certain USD value",
+                default: DEFAULT_FILTER_VALUE,
             }),
     handler: async argv => {
         const stageName = getStageName(argv.stage)
@@ -77,6 +84,7 @@ const positionCommand: CommandModule = {
             const positionNotional = toNumber(event.args.positionNotional)
             const exchangedPositionSize = toNumber(event.args.exchangedPositionSize)
             const price = Math.abs(positionNotional / exchangedPositionSize)
+            const value = Math.abs(price * exchangedPositionSize)
             const timestamp = getEstimatedBlockTimestamp(
                 metadata.layers.layer2.network as NetworkName,
                 blockNumber,
@@ -99,6 +107,10 @@ const positionCommand: CommandModule = {
             }
 
             if (argv["liquidated"] && event.args.liquidationPenalty.eq(0)) {
+                continue
+            }
+
+            if (argv["gt"] && value < (argv["gt"] as number)) {
                 continue
             }
 
