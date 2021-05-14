@@ -1,23 +1,17 @@
-import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHouse.sol/ClearingHouse.json"
-
-import { ClearingHouse } from "../type"
-import { getContract } from "./contract"
-import { Layer } from "../util/provider"
-import { Metadata } from "../util/metadata"
-
 import { Signer } from "@ethersproject/abstract-signer"
 import { TransactionReceipt } from "@ethersproject/abstract-provider"
-import { utils } from "ethers"
-import { formatError, formatProperty } from "./format"
-import { exit } from "yargs"
-import { closePosition, openPosition } from "../exec/contract/ClearingHouse"
+import { Layer } from "../util/provider"
+import { Metadata } from "../util/metadata"
+import { closePosition, openPosition, OpenPositionArg, ClosePositionArg } from "../exec/contract/ClearingHouse"
 
 export interface Actions {
     action: string
-    args: string
+    args: EmptyArg
 }
 
-export interface EmptyArg {}
+export interface EmptyArg {
+    verify: () => void
+}
 
 export interface actionOfFunction {
     openPosition: (meta: Metadata, signer: Signer, args: EmptyArg) => Promise<TransactionReceipt>
@@ -26,11 +20,11 @@ export interface actionOfFunction {
 
 export const actionMaps: actionOfFunction = {
     openPosition: async (meta: Metadata, signer: Signer, args: EmptyArg): Promise<TransactionReceipt> => {
-        return openPosition(meta, signer, args)
+        return openPosition(meta, signer, args as OpenPositionArg)
     },
 
     closePosition: async (meta: Metadata, signer: Signer, args: EmptyArg): Promise<TransactionReceipt> => {
-        return closePosition(meta, signer, args)
+        return closePosition(meta, signer, args as ClosePositionArg)
     },
 }
 

@@ -15,6 +15,10 @@ export function formatProperty(key: string, value: any) {
     return chalk.yellow(`- ${key}: `) + value
 }
 
+export function formatInfo(msg: any) {
+    return chalk.yellow(msg)
+}
+
 export function formatError(msg: any) {
     return chalk.red(`\nERROR! "${msg}"\n`)
 }
