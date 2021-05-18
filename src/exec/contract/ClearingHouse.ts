@@ -6,12 +6,12 @@ import { Metadata } from "../../util/metadata"
 
 import { Signer } from "@ethersproject/abstract-signer"
 import { TransactionReceipt } from "@ethersproject/abstract-provider"
-import { BigNumber, utils } from "ethers"
+import { BigNumber, ethers, utils } from "ethers"
 import { formatError, formatProperty } from "../../util/format"
-import { EmptyArg } from "../../util/functionsMap"
+import { BaseArgs } from "../../util/functionsMap"
 import { getSuggestedGas } from "../../util/provider"
 
-export class OpenPositionArg implements EmptyArg {
+export class OpenPositionArgs implements BaseArgs {
     constructor(
         readonly amm: string,
         readonly side: number,
@@ -28,44 +28,53 @@ export class OpenPositionArg implements EmptyArg {
             this.baseAssetAmountLimit === undefined ||
             this.quoteAssetAmount === undefined
         ) {
-            console.log(formatError("args for openPosition are incomplete"))
-            throw ""
+            const error = "args for openPosition are incomplete"
+            console.log(formatError(error))
+            throw new Error(error)
         }
 
-        if (!verifyAddress(this.amm.toString())) {
-            console.log(formatError("invalid address format"))
-            throw ""
+        if (!ethers.utils.isAddress(this.amm.toString())) {
+            const error = "invalid address format"
+            console.log(formatError(error))
+            throw new Error(error)
         }
         if (!(this.side == 0 || this.side == 1)) {
-            console.log(formatError("invalid `Side`"))
-            throw ""
+            const error = "invalid `Side`"
+            console.log(formatError(error))
+            throw new Error(error)
         }
     }
 }
 
-export class ClosePositionArg implements EmptyArg {
+export class ClosePositionArgs implements BaseArgs {
     constructor(readonly amm: string, readonly quoteAssetAmountLimit: string) {}
 
     verify() {
         if (this.quoteAssetAmountLimit === undefined || this.amm === undefined) {
-            console.log(formatError("args for closePosition are incomplete"))
-            throw ""
+            const error = "args for closePosition are incomplete"
+            console.log(formatError(error))
+            throw new Error(error)
         }
 
-        if (!verifyAddress(this.amm.toString())) {
-            console.log(formatError("invalid address format"))
-            throw ""
+        if (!ethers.utils.isAddress(this.amm.toString())) {
+            const error = "invalid address format"
+            console.log(formatError(error))
+            throw new Error(error)
         }
     }
 }
 
-export async function openPosition(meta: Metadata, signer: Signer, args: OpenPositionArg): Promise<TransactionReceipt> {
+export async function openPosition(
+    meta: Metadata,
+    signer: Signer,
+    args: OpenPositionArgs,
+): Promise<TransactionReceipt> {
     const clearingHouse = getContract<ClearingHouse>(
         meta.layers.layer2.contracts.ClearingHouse.address,
         ClearingHouseArtifact.abi,
         signer,
     ) as ClearingHouse
-    const openPositionArgs = new OpenPositionArg(
+    const openPositionArgs = new OpenPositionArgs(
         args.amm,
         args.side,
         args.quoteAssetAmount,
@@ -110,14 +119,14 @@ export async function openPosition(meta: Metadata, signer: Signer, args: OpenPos
 export async function closePosition(
     meta: Metadata,
     signer: Signer,
-    args: ClosePositionArg,
+    args: ClosePositionArgs,
 ): Promise<TransactionReceipt> {
     const clearingHouse = getContract<ClearingHouse>(
         meta.layers.layer2.contracts.ClearingHouse.address,
         ClearingHouseArtifact.abi,
         signer,
     ) as ClearingHouse
-    const closePositionArgs = new ClosePositionArg(args.amm, args.quoteAssetAmountLimit)
+    const closePositionArgs = new ClosePositionArgs(args.amm, args.quoteAssetAmountLimit)
     closePositionArgs.verify()
 
     const gasLimit = await getSuggestedGas(
@@ -136,9 +145,4 @@ export async function closePosition(
             options,
         )
     ).wait()
-}
-
-// Naive way to prevent from address not embedded by "" in yml file
-function verifyAddress(addr: string): boolean {
-    return addr.startsWith("0x") ? true : false
 }

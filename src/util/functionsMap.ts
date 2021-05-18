@@ -2,29 +2,29 @@ import { Signer } from "@ethersproject/abstract-signer"
 import { TransactionReceipt } from "@ethersproject/abstract-provider"
 import { Layer } from "../util/provider"
 import { Metadata } from "../util/metadata"
-import { closePosition, openPosition, OpenPositionArg, ClosePositionArg } from "../exec/contract/ClearingHouse"
+import { closePosition, openPosition, OpenPositionArgs, ClosePositionArgs } from "../exec/contract/ClearingHouse"
 
-export interface Actions {
+export interface Action {
     action: string
-    args: EmptyArg
+    args: BaseArgs
 }
 
-export interface EmptyArg {
+export interface BaseArgs {
     verify: () => void
 }
 
 export interface actionOfFunction {
-    openPosition: (meta: Metadata, signer: Signer, args: EmptyArg) => Promise<TransactionReceipt>
-    closePosition: (meta: Metadata, signer: Signer, args: EmptyArg) => Promise<TransactionReceipt>
+    openPosition: (meta: Metadata, signer: Signer, args: BaseArgs) => Promise<TransactionReceipt>
+    closePosition: (meta: Metadata, signer: Signer, args: BaseArgs) => Promise<TransactionReceipt>
 }
 
 export const actionMaps: actionOfFunction = {
-    openPosition: async (meta: Metadata, signer: Signer, args: EmptyArg): Promise<TransactionReceipt> => {
-        return openPosition(meta, signer, args as OpenPositionArg)
+    openPosition: async (meta: Metadata, signer: Signer, args: BaseArgs): Promise<TransactionReceipt> => {
+        return openPosition(meta, signer, args as OpenPositionArgs)
     },
 
-    closePosition: async (meta: Metadata, signer: Signer, args: EmptyArg): Promise<TransactionReceipt> => {
-        return closePosition(meta, signer, args as ClosePositionArg)
+    closePosition: async (meta: Metadata, signer: Signer, args: BaseArgs): Promise<TransactionReceipt> => {
+        return closePosition(meta, signer, args as ClosePositionArgs)
     },
 }
 

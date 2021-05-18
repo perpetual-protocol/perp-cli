@@ -6,17 +6,17 @@ import { fetchConfiguration, fetchMetadata, Contracts } from "../util/metadata"
 import { getProvider } from "../util/provider"
 import { getStageName } from "../util/stage"
 
-import { Actions, layerOfFunction, actionOfFunction, actionMaps } from "../util/functionsMap"
+import { Action, layerOfFunction, actionOfFunction, actionMaps } from "../util/functionsMap"
 import { PERP_MNEMONIC } from "../util/constant"
 import yaml from "js-yaml"
 import fs from "fs"
 import path from "path"
 
 const execCommand: CommandModule = {
-    command: "exec <file_name>",
+    command: "exec <filename>",
     describe: "interact with contracts",
     builder: yargs =>
-        yargs.positional("file_name", {
+        yargs.positional("filename", {
             describe: "a yml format file",
             type: "string",
         }),
@@ -25,11 +25,11 @@ const execCommand: CommandModule = {
         const stageName = getStageName(argv.stage)
         const metadata = await fetchMetadata(stageName)
         const config = await fetchConfiguration(stageName)
-        const file = argv.file_name as string
+        const file = argv.filename as string
         console.log(formatInfo(`** send the following txs on ${stageName} **\n`))
 
         const fullExecFilePath = path.join(__dirname, file)
-        const ops = yaml.load(fs.readFileSync(fullExecFilePath, "utf-8")) as Actions[]
+        const ops = yaml.load(fs.readFileSync(fullExecFilePath, "utf-8")) as Action[]
         const wallet = Wallet.fromMnemonic(PERP_MNEMONIC)
         for (const op of ops) {
             console.log(formatTitle(op.action))
