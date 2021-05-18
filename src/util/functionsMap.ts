@@ -8,6 +8,7 @@ import { closePosition, openPosition, OpenPositionArgs, ClosePositionArgs } from
 export interface Action {
     action: string
     args: BaseArgs
+    options?: Overrides
 }
 
 export interface BaseArgs {
@@ -15,13 +16,8 @@ export interface BaseArgs {
 }
 
 export interface actionOfFunction {
-    openPosition: (meta: Metadata, signer: Signer, args: BaseArgs, overrides?: Overrides) => Promise<TransactionReceipt>
-    closePosition: (
-        meta: Metadata,
-        signer: Signer,
-        args: BaseArgs,
-        overrides?: Overrides,
-    ) => Promise<TransactionReceipt>
+    openPosition: (meta: Metadata, signer: Signer, args: BaseArgs, overrides: Overrides) => Promise<TransactionReceipt>
+    closePosition: (meta: Metadata, signer: Signer, args: BaseArgs, overrides: Overrides) => Promise<TransactionReceipt>
 }
 
 export const actionMaps: actionOfFunction = {
@@ -29,7 +25,7 @@ export const actionMaps: actionOfFunction = {
         meta: Metadata,
         signer: Signer,
         args: BaseArgs,
-        overrides?: Overrides,
+        overrides: Overrides,
     ): Promise<TransactionReceipt> => {
         return openPosition(meta, signer, args as OpenPositionArgs, overrides)
     },
@@ -38,7 +34,7 @@ export const actionMaps: actionOfFunction = {
         meta: Metadata,
         signer: Signer,
         args: BaseArgs,
-        overrides?: Overrides,
+        overrides: Overrides,
     ): Promise<TransactionReceipt> => {
         return closePosition(meta, signer, args as ClosePositionArgs, overrides)
     },

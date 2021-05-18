@@ -52,24 +52,28 @@ const execCommand: CommandModule = {
         console.log(formatInfo(`** send the following txs on ${stageName} **\n`))
 
         const fullExecFilePath = path.resolve(file)
-        const ops = yaml.load(fs.readFileSync(fullExecFilePath, "utf-8")) as Action[]
+        const actions = yaml.load(fs.readFileSync(fullExecFilePath, "utf-8")) as Action[]
         const wallet = Wallet.fromMnemonic(PERP_MNEMONIC)
-        for (const op of ops) {
-            const functionName = op.action as keyof actionOfFunction
+        for (const action of actions) {
+            const functionName = action.action as keyof actionOfFunction
             const layer = layerOfFunction(functionName)
             if (gasPrice === undefined) {
                 if (layer == Layer.Layer1) gasPrice = DEFAULT_LAYER1_GAS_PRICE
                 else gasPrice = DEFAULT_LAYER2_GAS_PRICE
             }
+
             const options: Overrides = {
-                gasPrice: BigNumber.from(gasPrice.toString()),
+                gasPrice: BigNumber.from(gasPrice),
+                gasLimit: action.options?.gasLimit,
             }
 
-            console.log(formatTitle(op.action + `, gas price ${gasPrice / 1e9}g wei`))
-            console.log(op.args)
+            // TODO ${gasPrice} should be ${options.gasPrice}, but the decimal got cut down
+            console.log(formatTitle(action.action + `, gas price ${gasPrice}g wei, gas limit ${options.gasLimit}`))
+            console.log(action.args)
             const signer = wallet.connect(getProvider(layer, config))
-            const receipt = await actionMaps[functionName](metadata, signer, op.args, options)
+            const receipt = await actionMaps[functionName](metadata, signer, action.args, options)
             console.log(formatProperty("tx hash", receipt.transactionHash))
+            console.log(formatProperty("gas used", receipt.gasUsed))
             console.log()
         }
         return

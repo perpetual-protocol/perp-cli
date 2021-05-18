@@ -68,7 +68,7 @@ export async function openPosition(
     meta: Metadata,
     signer: Signer,
     args: OpenPositionArgs,
-    overrides?: Overrides,
+    overrides: Overrides,
 ): Promise<TransactionReceipt> {
     const clearingHouse = getContract<ClearingHouse>(
         meta.layers.layer2.contracts.ClearingHouse.address,
@@ -84,20 +84,21 @@ export async function openPosition(
     )
     openPositionArgs.verify()
 
-    const gasLimit = await getSuggestedGas(
-        clearingHouse,
-        "openPosition",
-        [
-            openPositionArgs.amm,
-            openPositionArgs.side,
-            { d: utils.parseEther(openPositionArgs.quoteAssetAmount.toString()) },
-            { d: utils.parseEther(openPositionArgs.leverage.toString()) },
-            { d: utils.parseEther(openPositionArgs.baseAssetAmountLimit.toString()) },
-        ],
-        await signer.getAddress(),
-    )
+    if (overrides.gasLimit === undefined) {
+        overrides.gasLimit = await getSuggestedGas(
+            clearingHouse,
+            "openPosition",
+            [
+                openPositionArgs.amm,
+                openPositionArgs.side,
+                { d: utils.parseEther(openPositionArgs.quoteAssetAmount.toString()) },
+                { d: utils.parseEther(openPositionArgs.leverage.toString()) },
+                { d: utils.parseEther(openPositionArgs.baseAssetAmountLimit.toString()) },
+            ],
+            await signer.getAddress(),
+        )
+    }
 
-    const options = { gasLimit: gasLimit }
     const tx = await (
         await clearingHouse
             .connect(signer)
@@ -121,7 +122,7 @@ export async function closePosition(
     meta: Metadata,
     signer: Signer,
     args: ClosePositionArgs,
-    overrides?: Overrides,
+    overrides: Overrides,
 ): Promise<TransactionReceipt> {
     const clearingHouse = getContract<ClearingHouse>(
         meta.layers.layer2.contracts.ClearingHouse.address,
@@ -131,13 +132,15 @@ export async function closePosition(
     const closePositionArgs = new ClosePositionArgs(args.amm, args.quoteAssetAmountLimit)
     closePositionArgs.verify()
 
-    const gasLimit = await getSuggestedGas(
-        clearingHouse,
-        "closePosition",
-        [closePositionArgs.amm, { d: utils.parseEther(closePositionArgs.quoteAssetAmountLimit.toString()) }],
-        await signer.getAddress(),
-    )
-    const options = { gasLimit: gasLimit }
+    if (overrides.gasLimit === undefined) {
+        overrides.gasLimit = await getSuggestedGas(
+            clearingHouse,
+            "closePosition",
+            [closePositionArgs.amm, { d: utils.parseEther(closePositionArgs.quoteAssetAmountLimit.toString()) }],
+            await signer.getAddress(),
+        )
+    }
+
     return await (
         await clearingHouse.connect(signer).closePosition(
             closePositionArgs.amm,

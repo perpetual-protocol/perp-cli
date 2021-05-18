@@ -7,6 +7,6 @@
     leverage: 2
     baseAssetAmountLimit: 0
   options:
-    limit: 1000000
+    gasLimit: 1000000
 
 
