@@ -28,7 +28,7 @@ const execCommand: CommandModule = {
         const file = argv.filename as string
         console.log(formatInfo(`** send the following txs on ${stageName} **\n`))
 
-        const fullExecFilePath = path.join(__dirname, file)
+        const fullExecFilePath = path.resolve(file)
         const ops = yaml.load(fs.readFileSync(fullExecFilePath, "utf-8")) as Action[]
         const wallet = Wallet.fromMnemonic(PERP_MNEMONIC)
         for (const op of ops) {
