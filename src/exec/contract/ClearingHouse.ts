@@ -6,7 +6,7 @@ import { Metadata } from "../../util/metadata"
 
 import { Signer } from "@ethersproject/abstract-signer"
 import { TransactionReceipt } from "@ethersproject/abstract-provider"
-import { BigNumber, ethers, utils } from "ethers"
+import { Overrides, utils, ethers } from "ethers"
 import { formatError, formatProperty } from "../../util/format"
 import { BaseArgs } from "../../util/functionsMap"
 import { getSuggestedGas } from "../../util/provider"
@@ -68,6 +68,7 @@ export async function openPosition(
     meta: Metadata,
     signer: Signer,
     args: OpenPositionArgs,
+    overrides?: Overrides,
 ): Promise<TransactionReceipt> {
     const clearingHouse = getContract<ClearingHouse>(
         meta.layers.layer2.contracts.ClearingHouse.address,
@@ -106,7 +107,7 @@ export async function openPosition(
                 { d: utils.parseEther(openPositionArgs.quoteAssetAmount.toString()) },
                 { d: utils.parseEther(openPositionArgs.leverage.toString()) },
                 { d: utils.parseEther(openPositionArgs.baseAssetAmountLimit.toString()) },
-                options,
+                overrides,
             )
     ).wait()
 
@@ -120,6 +121,7 @@ export async function closePosition(
     meta: Metadata,
     signer: Signer,
     args: ClosePositionArgs,
+    overrides?: Overrides,
 ): Promise<TransactionReceipt> {
     const clearingHouse = getContract<ClearingHouse>(
         meta.layers.layer2.contracts.ClearingHouse.address,
@@ -142,7 +144,7 @@ export async function closePosition(
             {
                 d: utils.parseEther(closePositionArgs.quoteAssetAmountLimit.toString()),
             },
-            options,
+            overrides,
         )
     ).wait()
 }

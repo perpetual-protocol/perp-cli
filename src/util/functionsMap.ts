@@ -1,5 +1,6 @@
 import { Signer } from "@ethersproject/abstract-signer"
 import { TransactionReceipt } from "@ethersproject/abstract-provider"
+import { Overrides } from "ethers"
 import { Layer } from "../util/provider"
 import { Metadata } from "../util/metadata"
 import { closePosition, openPosition, OpenPositionArgs, ClosePositionArgs } from "../exec/contract/ClearingHouse"
@@ -14,17 +15,32 @@ export interface BaseArgs {
 }
 
 export interface actionOfFunction {
-    openPosition: (meta: Metadata, signer: Signer, args: BaseArgs) => Promise<TransactionReceipt>
-    closePosition: (meta: Metadata, signer: Signer, args: BaseArgs) => Promise<TransactionReceipt>
+    openPosition: (meta: Metadata, signer: Signer, args: BaseArgs, overrides?: Overrides) => Promise<TransactionReceipt>
+    closePosition: (
+        meta: Metadata,
+        signer: Signer,
+        args: BaseArgs,
+        overrides?: Overrides,
+    ) => Promise<TransactionReceipt>
 }
 
 export const actionMaps: actionOfFunction = {
-    openPosition: async (meta: Metadata, signer: Signer, args: BaseArgs): Promise<TransactionReceipt> => {
-        return openPosition(meta, signer, args as OpenPositionArgs)
+    openPosition: async (
+        meta: Metadata,
+        signer: Signer,
+        args: BaseArgs,
+        overrides?: Overrides,
+    ): Promise<TransactionReceipt> => {
+        return openPosition(meta, signer, args as OpenPositionArgs, overrides)
     },
 
-    closePosition: async (meta: Metadata, signer: Signer, args: BaseArgs): Promise<TransactionReceipt> => {
-        return closePosition(meta, signer, args as ClosePositionArgs)
+    closePosition: async (
+        meta: Metadata,
+        signer: Signer,
+        args: BaseArgs,
+        overrides?: Overrides,
+    ): Promise<TransactionReceipt> => {
+        return closePosition(meta, signer, args as ClosePositionArgs, overrides)
     },
 }
 
