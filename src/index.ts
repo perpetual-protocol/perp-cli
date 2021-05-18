@@ -6,6 +6,7 @@ import positionHistory from "./command/position"
 import ammStatus from "./command/amm"
 import portfolio from "./command/portfolio"
 import verifyCommand from "./command/verify"
+import sendTx from "./command/exec"
 
 const SCRIPT_NAME = "perp"
 
@@ -19,6 +20,7 @@ yargs(hideBin(process.argv))
     .command(ammStatus)
     .command(portfolio)
     .command(verifyCommand)
+    .command(sendTx)
     .onFinishCommand(_ => {
         process.exit(0)
     })

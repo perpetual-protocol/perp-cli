@@ -1,5 +1,6 @@
-import { providers } from "ethers"
+import { BigNumber, providers } from "ethers"
 import { Configuration } from "./metadata"
+import { Contract } from "@ethersproject/contracts"
 
 export enum Layer {
     Layer1 = "layer1",
@@ -20,4 +21,15 @@ export function getProvider(layer: Layer, config: Configuration): providers.Prov
     } else {
         throw new Error("provider not exists")
     }
+}
+
+export async function getSuggestedGas(
+    contract: Contract,
+    funcName: string,
+    args: any[],
+    account: string,
+): Promise<BigNumber> {
+    const gasLimit = await contract.estimateGas[funcName](...args, { from: account })
+    // multiple estimated gas usage by 1.5
+    return gasLimit.mul(15).div(10)
 }

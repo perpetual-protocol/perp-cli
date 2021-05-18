@@ -15,6 +15,14 @@ export function formatProperty(key: string, value: any) {
     return chalk.yellow(`- ${key}: `) + value
 }
 
+export function formatInfo(msg: any) {
+    return chalk.yellow(msg)
+}
+
+export function formatError(msg: any) {
+    return chalk.red(`\nERROR! "${msg}"\n`)
+}
+
 export function formatDecimal(num: Stringify, decimals = DEFAULT_DECIMALS): string {
     const value = Number.parseFloat(utils.formatUnits(num.toString(), decimals))
     return Intl.NumberFormat("en-US").format(value)

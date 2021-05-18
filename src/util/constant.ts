@@ -12,3 +12,5 @@ export enum PnlCalcOption {
 
 // maintenance margin ratio: 6.25%
 export const MAINTENANCE_MARGIN_RATIO: BigNumber = utils.parseEther("1").mul(625).div(10000)
+
+export const PERP_MNEMONIC = `${process.env["PERP_MNEMONIC"]}`
