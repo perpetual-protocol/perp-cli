@@ -1,6 +1,6 @@
 import { Signer } from "@ethersproject/abstract-signer"
 import { TransactionReceipt } from "@ethersproject/abstract-provider"
-import { Overrides } from "ethers"
+import { BigNumber, Overrides } from "ethers"
 import { Layer } from "../util/provider"
 import { Metadata } from "../util/metadata"
 import { closePosition, openPosition, OpenPositionArgs, ClosePositionArgs } from "../exec/contract/ClearingHouse"
@@ -8,7 +8,12 @@ import { closePosition, openPosition, OpenPositionArgs, ClosePositionArgs } from
 export interface Action {
     action: string
     args: BaseArgs
-    options?: Overrides
+    options?: Options
+}
+
+export interface Options {
+    gasPrice: BigNumber | undefined
+    gasLimit: BigNumber | undefined
 }
 
 export interface BaseArgs {
@@ -16,8 +21,8 @@ export interface BaseArgs {
 }
 
 export interface actionOfFunction {
-    openPosition: (meta: Metadata, signer: Signer, args: BaseArgs, overrides: Overrides) => Promise<TransactionReceipt>
-    closePosition: (meta: Metadata, signer: Signer, args: BaseArgs, overrides: Overrides) => Promise<TransactionReceipt>
+    openPosition: (meta: Metadata, signer: Signer, args: BaseArgs, options: Options) => Promise<TransactionReceipt>
+    closePosition: (meta: Metadata, signer: Signer, args: BaseArgs, options: Options) => Promise<TransactionReceipt>
 }
 
 export const actionMaps: actionOfFunction = {
@@ -25,18 +30,18 @@ export const actionMaps: actionOfFunction = {
         meta: Metadata,
         signer: Signer,
         args: BaseArgs,
-        overrides: Overrides,
+        options: Options,
     ): Promise<TransactionReceipt> => {
-        return openPosition(meta, signer, args as OpenPositionArgs, overrides)
+        return openPosition(meta, signer, args as OpenPositionArgs, options)
     },
 
     closePosition: async (
         meta: Metadata,
         signer: Signer,
         args: BaseArgs,
-        overrides: Overrides,
+        options: Options,
     ): Promise<TransactionReceipt> => {
-        return closePosition(meta, signer, args as ClosePositionArgs, overrides)
+        return closePosition(meta, signer, args as ClosePositionArgs, options)
     },
 }
 

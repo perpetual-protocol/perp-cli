@@ -8,8 +8,9 @@ import { Signer } from "@ethersproject/abstract-signer"
 import { TransactionReceipt } from "@ethersproject/abstract-provider"
 import { Overrides, utils, ethers } from "ethers"
 import { formatError, formatProperty } from "../../util/format"
-import { BaseArgs } from "../../util/functionsMap"
+import { BaseArgs, Options } from "../../util/functionsMap"
 import { getSuggestedGas } from "../../util/provider"
+import { throwError } from "../../util/utils"
 
 export class OpenPositionArgs implements BaseArgs {
     constructor(
@@ -28,20 +29,14 @@ export class OpenPositionArgs implements BaseArgs {
             this.baseAssetAmountLimit === undefined ||
             this.quoteAssetAmount === undefined
         ) {
-            const error = "args for openPosition are incomplete"
-            console.log(formatError(error))
-            throw new Error(error)
+            throwError("args for openPosition are incomplete")
         }
 
         if (!ethers.utils.isAddress(this.amm.toString())) {
-            const error = "invalid address format"
-            console.log(formatError(error))
-            throw new Error(error)
+            throwError("invalid address format")
         }
         if (!(this.side == 0 || this.side == 1)) {
-            const error = "invalid `Side`"
-            console.log(formatError(error))
-            throw new Error(error)
+            throwError("invalid `Side`")
         }
     }
 }
@@ -51,15 +46,11 @@ export class ClosePositionArgs implements BaseArgs {
 
     verify() {
         if (this.quoteAssetAmountLimit === undefined || this.amm === undefined) {
-            const error = "args for closePosition are incomplete"
-            console.log(formatError(error))
-            throw new Error(error)
+            throwError("args for closePosition are incomplete")
         }
 
         if (!ethers.utils.isAddress(this.amm.toString())) {
-            const error = "invalid address format"
-            console.log(formatError(error))
-            throw new Error(error)
+            throwError("invalid address format")
         }
     }
 }
@@ -68,7 +59,7 @@ export async function openPosition(
     meta: Metadata,
     signer: Signer,
     args: OpenPositionArgs,
-    overrides: Overrides,
+    options: Options,
 ): Promise<TransactionReceipt> {
     const clearingHouse = getContract<ClearingHouse>(
         meta.layers.layer2.contracts.ClearingHouse.address,
@@ -84,8 +75,8 @@ export async function openPosition(
     )
     openPositionArgs.verify()
 
-    if (overrides.gasLimit === undefined) {
-        overrides.gasLimit = await getSuggestedGas(
+    if (options.gasLimit === undefined) {
+        options.gasLimit = await getSuggestedGas(
             clearingHouse,
             "openPosition",
             [
@@ -108,7 +99,7 @@ export async function openPosition(
                 { d: utils.parseEther(openPositionArgs.quoteAssetAmount.toString()) },
                 { d: utils.parseEther(openPositionArgs.leverage.toString()) },
                 { d: utils.parseEther(openPositionArgs.baseAssetAmountLimit.toString()) },
-                overrides,
+                options,
             )
     ).wait()
 
@@ -122,7 +113,7 @@ export async function closePosition(
     meta: Metadata,
     signer: Signer,
     args: ClosePositionArgs,
-    overrides: Overrides,
+    options: Options,
 ): Promise<TransactionReceipt> {
     const clearingHouse = getContract<ClearingHouse>(
         meta.layers.layer2.contracts.ClearingHouse.address,
@@ -132,8 +123,8 @@ export async function closePosition(
     const closePositionArgs = new ClosePositionArgs(args.amm, args.quoteAssetAmountLimit)
     closePositionArgs.verify()
 
-    if (overrides.gasLimit === undefined) {
-        overrides.gasLimit = await getSuggestedGas(
+    if (options.gasLimit === undefined) {
+        options.gasLimit = await getSuggestedGas(
             clearingHouse,
             "closePosition",
             [closePositionArgs.amm, { d: utils.parseEther(closePositionArgs.quoteAssetAmountLimit.toString()) }],
@@ -147,7 +138,7 @@ export async function closePosition(
             {
                 d: utils.parseEther(closePositionArgs.quoteAssetAmountLimit.toString()),
             },
-            overrides,
+            options,
         )
     ).wait()
 }

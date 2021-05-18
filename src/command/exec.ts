@@ -6,11 +6,12 @@ import { fetchConfiguration, fetchMetadata, Contracts } from "../util/metadata"
 import { getProvider, Layer } from "../util/provider"
 import { getStageName } from "../util/stage"
 
-import { Action, layerOfFunction, actionOfFunction, actionMaps } from "../util/functionsMap"
+import { Action, layerOfFunction, actionOfFunction, actionMaps, Options } from "../util/functionsMap"
 import { PERP_MNEMONIC } from "../util/constant"
 import yaml from "js-yaml"
 import fs from "fs"
 import path from "path"
+import { throwError } from "../util/utils"
 
 // default gas price of layer 2: 1g wei
 const DEFAULT_LAYER2_GAS_PRICE = 1_000_000_000
@@ -20,8 +21,7 @@ const DEFAULT_LAYER1_GAS_PRICE = 20_000_000_000
 function getGasPrice(gasPrice: number): number {
     if (gasPrice != undefined) {
         if (gasPrice > 10000) {
-            console.log(formatError(`incorrect gas price, input should be ${gasPrice / 1e9} instead of ${gasPrice}`))
-            throw ""
+            throwError(`incorrect gas price, input should be ${gasPrice / 1e9} instead of ${gasPrice}`)
         }
         gasPrice *= 1e9
     }
@@ -62,18 +62,20 @@ const execCommand: CommandModule = {
                 else gasPrice = DEFAULT_LAYER2_GAS_PRICE
             }
 
-            const options: Overrides = {
-                gasPrice: BigNumber.from(gasPrice),
+            // gasPrice: if gasPrice is set in yml, overwrite the gasPrice from the inputs
+            const options: Options = {
+                gasPrice: action.options?.gasPrice || BigNumber.from(gasPrice),
                 gasLimit: action.options?.gasLimit,
             }
-
-            // TODO ${gasPrice} should be ${options.gasPrice}, but the decimal got cut down
-            console.log(formatTitle(action.action + `, gas price ${gasPrice}g wei, gas limit ${options.gasLimit}`))
+            const gasPriceForConsole = BigNumber.from(options.gasPrice).toNumber() / 1e9
+            console.log(
+                formatTitle(action.action + `, gas price ${gasPriceForConsole}g wei, gas limit ${options.gasLimit}`),
+            )
             console.log(action.args)
             const signer = wallet.connect(getProvider(layer, config))
             const receipt = await actionMaps[functionName](metadata, signer, action.args, options)
             console.log(formatProperty("tx hash", receipt.transactionHash))
-            console.log(formatProperty("gas used", receipt.gasUsed))
+            console.log(formatProperty("gas used", Intl.NumberFormat("en-US").format(receipt.gasUsed.toNumber())))
             console.log()
         }
         return
