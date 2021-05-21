@@ -11,6 +11,8 @@ import { getProvider, Layer } from "../util/provider"
 import { getStageName } from "../util/stage"
 import { InsuranceFund, Amm, ClearingHouse, TetherToken } from "../type"
 import { getContract } from "../util/contract"
+import { estimatedFundingRate } from "../util/calculation"
+import { throwError } from "../util/utils"
 
 const ammCommand: CommandModule = {
     command: "amm [<amm>]",
@@ -68,6 +70,8 @@ const ammCommand: CommandModule = {
             const quoteAssetReserve = reserve[0]
             const baseAssetReserve = reserve[1]
             const priceFeed = await amm.priceFeed()
+            // multiple by 100 to get number of %
+            const estFundingRate = ((await estimatedFundingRate(amm)).toNumber() / 1e18) * 100
             let symbol = ""
 
             if (!tokenSymbolMap.has(quoteAssetAddress)) {
@@ -79,13 +83,12 @@ const ammCommand: CommandModule = {
             }
 
             let priceFeedName = ""
-
             if (priceFeed === layer2Contracts.L2PriceFeed.address) {
                 priceFeedName = "L2PriceFeed"
             } else if (priceFeed === layer2Contracts.ChainlinkPriceFeed.address) {
                 priceFeedName = "ChainlinkPriceFeed"
             } else {
-                throw new Error(
+                throwError(
                     "PriceFeed is not L2PriceFeed or ChainlinkPriceFeed, check it immediately!! address: " + priceFeed,
                 )
             }
@@ -109,6 +112,7 @@ const ammCommand: CommandModule = {
                     formatProperty("BaseAssetReserve", formatDecimal(baseAssetReserve)) + ` ${priceFeedKey}${symbol}`,
                 )
                 console.log(formatProperty("PriceFeed", priceFeedName))
+                console.log(formatProperty("est.funding rate", `${estFundingRate} %`))
                 console.log("")
             }
             if (ammPair && ammPair == priceFeedKey) {

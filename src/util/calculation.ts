@@ -1,6 +1,8 @@
 import Big from "big.js"
 import { BigNumber } from "ethers"
-import { bigNum2Big, big2BigNum } from "./dataTypes"
+import { DateTime } from "luxon"
+import { Amm } from "../type"
+import { bigNum2Big, big2BigNum, decimal2Big } from "./dataTypes"
 
 export function getLiquidationPrice(
     leverage: BigNumber,
@@ -49,4 +51,18 @@ function calcLiquidationPrice(
               .mul(-0.5)
               .add(positionSize.mul(pn).pow(2).minus(pn.mul(k).mul(positionSize).mul(4)).sqrt().div(pn.mul(-2)))
     return k.div(x.pow(2))
+}
+
+export async function estimatedFundingRate(amm: Amm): Promise<BigNumber> {
+    const durationFromSharp = DateTime.local().minute * 60
+    const twapPrice = await amm.getTwapPrice(durationFromSharp)
+    const underlyingTwapPrice = await amm.getUnderlyingTwapPrice(durationFromSharp)
+    const fundingPeriod = await amm.fundingPeriod()
+
+    const oneDayInSec = 60 * 60 * 24
+    const marketTwapPrice = decimal2Big(twapPrice)
+    const indexTwapPrice = decimal2Big(underlyingTwapPrice)
+    const premium = marketTwapPrice.minus(indexTwapPrice)
+    const premiumFraction = premium.mul(fundingPeriod.toString()).div(oneDayInSec)
+    return big2BigNum(premiumFraction.div(indexTwapPrice))
 }
