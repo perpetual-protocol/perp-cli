@@ -229,7 +229,7 @@ export async function removeMargin(
     }
 
     return await (
-        await clearingHouse.connect(signer).addMargin(
+        await clearingHouse.connect(signer).removeMargin(
             removeMarginArgs.amm,
             {
                 d: utils.parseEther(removeMarginArgs.removedMargin.toString()),
