@@ -23,6 +23,7 @@ export interface Action {
 export interface Options {
     gasPrice: BigNumber | undefined
     gasLimit: BigNumber | undefined
+    nonce: BigNumber | undefined
 }
 
 export interface BaseArgs {
