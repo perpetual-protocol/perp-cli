@@ -41,6 +41,11 @@ const execCommand: CommandModule = {
                 alias: "g",
                 type: "number",
                 describe: "gas price in gwei, eg. 1.5 means 1.5 gwei",
+            })
+            .option("nonce", {
+                alias: "n",
+                type: "number",
+                describe: "user's nonce",
             }),
 
     handler: async argv => {
@@ -49,11 +54,13 @@ const execCommand: CommandModule = {
         const config = await fetchConfiguration(stageName)
         const file = argv.filename as string
         let gasPrice = getGasPrice(argv["gasPrice"] as number)
+        let nonce = argv["nonce"] as number
         console.log(formatInfo(`** send the following txs on ${stageName} **\n`))
 
         const fullExecFilePath = path.resolve(file)
         const actions = yaml.load(fs.readFileSync(fullExecFilePath, "utf-8")) as Action[]
         const wallet = Wallet.fromMnemonic(PERP_MNEMONIC)
+
         for (const action of actions) {
             const functionName = action.action as keyof actionOfFunction
             const layer = layerOfFunction(functionName)
@@ -63,16 +70,24 @@ const execCommand: CommandModule = {
             }
 
             // gasPrice: if gasPrice is set in yml, overwrite the gasPrice from the inputs
+            // nonce: if nonce is not set, keep it undefined
             const options: Options = {
                 gasPrice: action.options?.gasPrice || BigNumber.from(gasPrice),
                 gasLimit: action.options?.gasLimit,
+                nonce: nonce ? BigNumber.from(nonce) : undefined,
             }
             const gasPriceForConsole = BigNumber.from(options.gasPrice).toNumber() / 1e9
+            const signer = wallet.connect(getProvider(layer, config))
+            const nextNonce = nonce ? BigNumber.from(nonce++) : await signer.getTransactionCount()
+            console.log(formatTitle(action.action))
             console.log(
-                formatTitle(action.action + `, gas price ${gasPriceForConsole}g wei, gas limit ${options.gasLimit}`),
+                formatProperty(
+                    "property",
+                    `gas price ${gasPriceForConsole}g wei, nonce ${nextNonce} and gas limit ${options.gasLimit}`,
+                ),
             )
             console.log(action.args)
-            const signer = wallet.connect(getProvider(layer, config))
+
             const receipt = await actionMaps[functionName](metadata, signer, action.args, options)
             console.log(formatProperty("tx hash", receipt.transactionHash))
             console.log(formatProperty("gas used", Intl.NumberFormat("en-US").format(receipt.gasUsed.toNumber())))
