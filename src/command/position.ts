@@ -11,6 +11,7 @@ import { getStageName } from "../util/stage"
 import { Amm, ClearingHouse } from "../type"
 import { getContract } from "../util/contract"
 import { getEstimatedBlockTimestamp, timestamp2DateStr } from "../util/time"
+import { BaseLogger } from "../cli/middeware"
 
 const DEFAULT_BLOCK_LIMIT = 10
 const DEFAULT_FILTER_VALUE = 10
@@ -78,6 +79,9 @@ const positionCommand: CommandModule = {
             null,
         )
         const events = await clearingHouse.queryFilter(filter, blockNumber - blockLimit, blockNumber)
+        const logger = argv.logger as BaseLogger
+        const { formatTitle, formatProperty, log } = logger
+
         let i = 0
         for (const event of events) {
             const side = event.args.exchangedPositionSize.gt(0) ? "Buy" : "Sell"
@@ -114,15 +118,15 @@ const positionCommand: CommandModule = {
                 continue
             }
 
-            console.log(chalk.green(`PositionChanged event #${i + 1}`))
-            console.log(formatProperty("estimated time", timestamp2DateStr(timestamp)))
-            console.log(formatProperty("trader", event.args.trader))
-            console.log(formatProperty("asset", pairName))
-            console.log(formatProperty("side", side))
-            console.log(formatProperty("price", price))
-            console.log(formatProperty("size", exchangedPositionSize))
-            console.log(formatProperty("tx", event.transactionHash))
-            console.log("")
+            log(formatTitle(`PositionChanged event #${i + 1}`))
+            log(formatProperty("estimated time", timestamp2DateStr(timestamp)))
+            log(formatProperty("trader", event.args.trader))
+            log(formatProperty("asset", pairName))
+            log(formatProperty("side", side))
+            log(formatProperty("price", price))
+            log(formatProperty("size", exchangedPositionSize))
+            log(formatProperty("tx", event.transactionHash))
+            log("")
             i++
         }
     },
