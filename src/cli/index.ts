@@ -3,4 +3,6 @@
 import { runner } from "./runner"
 import { hideBin } from "yargs/helpers"
 
-runner().parse(hideBin(process.argv))
+runner()
+    .onFinishCommand(() => process.exit(0))
+    .parse(hideBin(process.argv))
