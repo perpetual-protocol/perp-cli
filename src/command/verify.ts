@@ -81,6 +81,7 @@ const verifyCommand: CommandModule = {
         log(formatInfo("- args:"))
         const args = [...txInfo.args]
         log(JSON.stringify(formatArray(args), null, 2))
+        log("")
     },
 }
 

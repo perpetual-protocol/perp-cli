@@ -21,13 +21,13 @@ export function LoggerMiddleware(argv: Arguments) {
 type logFn = (str: string) => void
 
 export class BaseLogger {
-    readonly log: logFn
+    readonly _logFn: logFn
 
     constructor(fn: logFn) {
         if (!fn) {
             throw new Error(`BaseLogger: required logFn when initialize`)
         }
-        this.log = fn
+        this._logFn = fn
     }
 
     formatTitle(title: string) {
@@ -57,10 +57,27 @@ export class BaseLogger {
     warning() {
         // NOTE: add this functionality if needed
     }
+
+    log = (str: string) => {
+        this._logFn(str)
+    }
 }
 
 class BotLogger extends BaseLogger {
     // NOTE: add any customization for BotLogger here
+    private bufferedStr: string = ''
+
+    log = (str: string) => {
+        // NOTE: use empty string as the termination character to send message
+        if (str !== '') {
+            this.bufferedStr += `${str}\n`
+        } else {
+            this._logFn(
+                `\`\`\`${this.bufferedStr}\`\`\``
+            )
+            this.bufferedStr = ''
+        }
+    }
 }
 
 class CommandlineLogger extends BaseLogger {

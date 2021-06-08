@@ -121,6 +121,7 @@ const ammCommand: CommandModule = {
                 break
             }
         }
+        log("")
     },
 }
 
