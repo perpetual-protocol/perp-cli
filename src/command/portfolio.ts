@@ -3,10 +3,8 @@ import AmmArtifact from "@perp/contract/build/contracts/src/Amm.sol/Amm.json"
 import InsuranceFundArtifact from "@perp/contract/build/contracts/src/InsuranceFund.sol/InsuranceFund.json"
 import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHouse.sol/ClearingHouse.json"
 import ClearingHouseViewerArtifact from "@perp/contract/build/contracts/src/ClearingHouseViewer.sol/ClearingHouseViewer.json"
-import chalk from "chalk"
 import { utils } from "ethers"
 import { CommandModule } from "yargs"
-import { formatProperty, formatTitle } from "../util/format"
 import { fetchConfiguration, fetchMetadata } from "../util/metadata"
 import { getProvider, Layer } from "../util/provider"
 import { getStageName } from "../util/stage"
@@ -15,6 +13,7 @@ import { getLiquidationPrice } from "../util/calculation"
 import { ONE_ETH } from "../util/dataTypes"
 import { PnlCalcOption, MAINTENANCE_MARGIN_RATIO } from "../util/constant"
 import { balanceOf, getContract } from "../util/contract"
+import { BaseLogger } from "../cli/middeware"
 
 const portfolioCommand: CommandModule = {
     command: "portfolio <trader_addr>",
@@ -34,6 +33,8 @@ const portfolioCommand: CommandModule = {
         const layer2Contracts = metadata.layers.layer2.contracts
         const layer1Contracts = metadata.layers.layer1.contracts
         const trader = argv.trader_addr as string
+        const logger = argv.logger as BaseLogger
+        const { formatTitle, formatProperty, log } = logger
 
         const layer1Usdc = getContract<TetherToken>(
             metadata.layers.layer1.externalContracts.usdc,
@@ -68,10 +69,10 @@ const portfolioCommand: CommandModule = {
         const layer2Balance = await balanceOf(trader, layer2Usdc)
         const symbol = await layer1Usdc.symbol()
 
-        console.log(formatTitle("Balances"))
-        console.log(formatProperty("layer1", `${layer1Balance} ${symbol}`))
-        console.log(formatProperty("layer2", `${layer2Balance} ${symbol}`))
-        console.log("")
+        log(formatTitle("Balances"))
+        log(formatProperty("layer1", `${layer1Balance} ${symbol}`))
+        log(formatProperty("layer2", `${layer2Balance} ${symbol}`))
+        log("")
 
         const ammAddressList = await insuranceFund.getAllAmms()
         for (const addr of ammAddressList) {
@@ -102,16 +103,16 @@ const portfolioCommand: CommandModule = {
                 k,
             )
 
-            console.log(formatTitle(`${priceFeedKey}/${symbol}`))
-            console.log(formatProperty("position size", utils.formatEther(pos.size.d)))
-            console.log(formatProperty("margin (with funding payment)", utils.formatEther(pos.margin.d)))
-            console.log(formatProperty("margin ratio", utils.formatEther(marginRatio.d.mul("100")) + " %"))
-            console.log(formatProperty("leverage", utils.formatEther(leverage)))
-            console.log(formatProperty("pnl", utils.formatEther(posNotionalNPnl.unrealizedPnl.d)))
-            console.log(formatProperty("liq. price", utils.formatEther(liquidationPrice)))
-            console.log(formatProperty("open notional", utils.formatEther(pos.openNotional.d)))
-            console.log(formatProperty("last open at block", pos.blockNumber))
-            console.log("")
+            log(formatTitle(`${priceFeedKey}/${symbol}`))
+            log(formatProperty("position size", utils.formatEther(pos.size.d)))
+            log(formatProperty("margin (with funding payment)", utils.formatEther(pos.margin.d)))
+            log(formatProperty("margin ratio", utils.formatEther(marginRatio.d.mul("100")) + " %"))
+            log(formatProperty("leverage", utils.formatEther(leverage)))
+            log(formatProperty("pnl", utils.formatEther(posNotionalNPnl.unrealizedPnl.d)))
+            log(formatProperty("liq. price", utils.formatEther(liquidationPrice)))
+            log(formatProperty("open notional", utils.formatEther(pos.openNotional.d)))
+            log(formatProperty("last open at block", pos.blockNumber))
+            log("")
         }
     },
 }

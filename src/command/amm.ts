@@ -2,10 +2,9 @@ import AmmArtifact from "@perp/contract/build/contracts/src/Amm.sol/Amm.json"
 import TetherTokenArtifact from "@perp/contract/build/contracts/src/mock/TetherToken.sol/TetherToken.json"
 import InsuranceFundArtifact from "@perp/contract/build/contracts/src/InsuranceFund.sol/InsuranceFund.json"
 import ClearingHouseArtifact from "@perp/contract/build/contracts/src/ClearingHouse.sol/ClearingHouse.json"
-import chalk from "chalk"
 import { utils } from "ethers"
 import { CommandModule } from "yargs"
-import { formatDecimal, formatProperty, formatTitle } from "../util/format"
+import { formatDecimal } from "../util/format"
 import { fetchConfiguration, fetchMetadata } from "../util/metadata"
 import { getProvider, Layer } from "../util/provider"
 import { getStageName } from "../util/stage"
@@ -13,6 +12,7 @@ import { InsuranceFund, Amm, ClearingHouse, TetherToken } from "../type"
 import { getContract } from "../util/contract"
 import { estimatedFundingRate } from "../util/calculation"
 import { throwError } from "../util/utils"
+import { BaseLogger } from "../cli/middeware"
 
 const ammCommand: CommandModule = {
     command: "amm [<amm>]",
@@ -33,6 +33,8 @@ const ammCommand: CommandModule = {
         const ammArg = argv.amm as string
         const ammPair = utils.isAddress(ammArg) ? "" : ammArg
         const tokenSymbolMap = new Map<string, string>()
+        const logger = argv.logger as BaseLogger
+        const { formatTitle, formatProperty, log } = logger
 
         const insuranceFund = getContract<InsuranceFund>(
             layer2Contracts.InsuranceFund.address,
@@ -94,31 +96,32 @@ const ammCommand: CommandModule = {
             }
 
             if (flagShortList) {
-                console.log(formatProperty(`${priceFeedKey}/${symbol}`, addr))
+                log(formatProperty(`${priceFeedKey}/${symbol}`, addr))
             } else {
-                console.log(formatTitle(`${priceFeedKey}/${symbol}`))
-                console.log(formatProperty("Proxy Address", addr))
-                console.log(formatProperty("Index Price", `${formatDecimal(indexPrice)} ${symbol}`))
-                console.log(formatProperty("Market Price", `${formatDecimal(marketPrice)} ${symbol}`))
-                console.log(
+                log(formatTitle(`${priceFeedKey}/${symbol}`))
+                log(formatProperty("Proxy Address", addr))
+                log(formatProperty("Index Price", `${formatDecimal(indexPrice)} ${symbol}`))
+                log(formatProperty("Market Price", `${formatDecimal(marketPrice)} ${symbol}`))
+                log(
                     formatProperty("OpenInterestNotionalCap", `${formatDecimal(openInterestNotionalCap)} ${symbol}`),
                 )
-                console.log(formatProperty("OpenInterestNotional", `${formatDecimal(openInterestNotional)} ${symbol}`))
-                console.log(
+                log(formatProperty("OpenInterestNotional", `${formatDecimal(openInterestNotional)} ${symbol}`))
+                log(
                     formatProperty("MaxHoldingBaseAsset", `${formatDecimal(maxHoldingBaseAsset)} ${priceFeedKey}`),
                 )
-                console.log(formatProperty("QuoteAssetReserve", `${formatDecimal(quoteAssetReserve)} ${symbol}`))
-                console.log(
+                log(formatProperty("QuoteAssetReserve", `${formatDecimal(quoteAssetReserve)} ${symbol}`))
+                log(
                     formatProperty("BaseAssetReserve", formatDecimal(baseAssetReserve)) + ` ${priceFeedKey}${symbol}`,
                 )
-                console.log(formatProperty("PriceFeed", priceFeedName))
-                console.log(formatProperty("est.funding rate", `${estFundingRate} %`))
-                console.log("")
+                log(formatProperty("PriceFeed", priceFeedName))
+                log(formatProperty("est.funding rate", `${estFundingRate} %`))
+                log("")
             }
             if (ammPair && ammPair == priceFeedKey) {
                 break
             }
         }
+        log("")
     },
 }
 

@@ -7,6 +7,7 @@ import { join } from "path"
 import { Contract } from "@ethersproject/contracts"
 import { formatArray, formatProperty, formatTitle } from "../util/format"
 import chalk from "chalk"
+import { BaseLogger } from "../cli/middeware"
 
 interface ContractInfo {
     key: string
@@ -72,11 +73,15 @@ const verifyCommand: CommandModule = {
         const artifact = JSON.parse(cat(artifactPath))
         const contract = new Contract(address, artifact.abi, provider)
         const txInfo = contract.interface.parseTransaction({ data })
-        console.log(formatTitle(`Contract ${contractInfo.key} (${contractInfo.metadata.name})`))
-        console.log(formatProperty("function name", txInfo.functionFragment.name))
-        console.log(chalk.yellow("- args:"))
+        const logger = argv.logger as BaseLogger
+        const { formatTitle, formatProperty, formatInfo, log } = logger
+
+        log(formatTitle(`Contract ${contractInfo.key} (${contractInfo.metadata.name})`))
+        log(formatProperty("function name", txInfo.functionFragment.name))
+        log(formatInfo("- args:"))
         const args = [...txInfo.args]
-        console.log(JSON.stringify(formatArray(args), null, 2))
+        log(JSON.stringify(formatArray(args), null, 2))
+        log("")
     },
 }
 
