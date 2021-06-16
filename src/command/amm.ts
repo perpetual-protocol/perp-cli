@@ -121,7 +121,9 @@ const ammCommand: CommandModule = {
                 break
             }
         }
-        log("")
+        if (flagShortList) {
+            log("")
+        }
     },
 }
 

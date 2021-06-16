@@ -1,12 +1,10 @@
-import yargs, { CommandModule } from "yargs"
+import yargs from "yargs"
 import positionHistory from "../command/position"
 import ammStatus from "../command/amm"
 import portfolio from "../command/portfolio"
 import verifyCommand from "../command/verify"
 import sendTx from "../command/exec"
-import { getStageName } from "../util/stage"
-import { fetchConfiguration } from "../util/metadata"
-import { BaseLogger, LoggerMiddleware } from "./middeware"
+import { LoggerMiddleware } from "./middeware"
 
 const SCRIPT_NAME = "perp"
 

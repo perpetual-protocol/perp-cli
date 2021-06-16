@@ -1,6 +1,6 @@
 {
     "name": "@perp/cli",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "CLI for Perpetual Protocol",
     "main": "build/src/index.js",
     "module": "build/src/index.js",
@@ -29,7 +29,7 @@
         "@types/node": "14.14.41",
         "@types/node-fetch": "2.5.10",
         "@types/shelljs": "0.8.8",
-        "@types/yargs": "16.0.1",
+        "@types/yargs": "17.0.0",
         "chai": "4.3.4",
         "mocha": "8.3.2",
         "nyc": "15.1.0",
@@ -47,6 +47,6 @@
         "luxon": "1.26.0",
         "node-fetch": "2.6.1",
         "shelljs": "0.8.4",
-        "yargs": "16.2.0"
+        "yargs": "17.0.1"
     }
 }
