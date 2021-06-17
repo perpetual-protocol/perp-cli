@@ -1,6 +1,7 @@
 .github
 .vscode
 .nyc_output
+.idea
 script
 src
 test
