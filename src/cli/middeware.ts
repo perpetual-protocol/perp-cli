@@ -63,11 +63,11 @@ export class BaseLogger {
     }
 }
 
-class BotLogger extends BaseLogger {
+export class BotLogger extends BaseLogger {
     // NOTE: add any customization for BotLogger here
     private bufferedStr: string = ''
 
-    log = (str: string) => {
+    log = (str: string = '') => {
         // NOTE: use empty string as the termination character to send message
         if (str !== '') {
             this.bufferedStr += `${str}\n`
@@ -77,6 +77,10 @@ class BotLogger extends BaseLogger {
             )
             this.bufferedStr = ''
         }
+    }
+
+    logLine = (str: string = '') => {
+        this._logFn(str)
     }
 }
 
