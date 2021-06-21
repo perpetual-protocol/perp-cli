@@ -3,10 +3,9 @@ import { ContractMetadata, fetchConfiguration, fetchMetadata, Metadata } from ".
 import { getProvider, Layer } from "../util/provider"
 import { getStageName } from "../util/stage"
 import { cat, find } from "shelljs"
-import { join } from "path"
+import { join, dirname } from "path"
 import { Contract } from "@ethersproject/contracts"
-import { formatArray, formatProperty, formatTitle } from "../util/format"
-import chalk from "chalk"
+import { formatArray } from "../util/format"
 import { BaseLogger } from "../cli/middeware"
 
 interface ContractInfo {
@@ -25,14 +24,8 @@ function findContractInfo(metadata: Metadata, layer: Layer, contractAddress: str
 }
 
 function getContractModulePath() {
-    // if typescript compiles to javascript file, it will be in build directory
-    // which is one more layer than typescript, so add one more '..' to upper level
-    const jsMode = __filename.includes(".js")
-    const paths = jsMode
-        ? [__dirname, "..", "..", "..", "node_modules", "@perp", "contract", "build", "contracts"]
-        : [__dirname, "..", "..", "node_modules", "@perp", "contract", "build", "contracts"]
-
-    return join(...paths)
+    const perpContractPackagePath = dirname(require.resolve("@perp/contract/package.json"));
+    return join(perpContractPackagePath, "build", "contracts")
 }
 
 const verifyCommand: CommandModule = {
