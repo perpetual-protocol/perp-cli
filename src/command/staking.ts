@@ -49,6 +49,7 @@ const stakingCommand: CommandModule = {
         )
         log(`PERP staking reward vesting allowance: ${commify(toNumber(allowanceVesting))}`)
         log(`PERP staking reward noVesting allowance: ${commify(toNumber(allowanceNoVesting))}`)
+        log(``)
     },
 }
 
