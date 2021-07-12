@@ -181,9 +181,9 @@ output:
   ]
 ```
 
-## Advanced (Not available yet)
+## Advanced
 
-Use `export PERP_MNEMONIC=<mnemonic>` to set a private key. Then you can use `perp exec` to execute transactions with an execution file.
+Use `export PERP_MNEMONIC=<mnemonic>` to set a mnemonic phrase (seed phrase). Then you can use `perp exec` to execute transactions with an execution file.
 
 ```shell
 $ perp exec <filename>
@@ -200,6 +200,8 @@ For example, if you want to open a long position for BTC, the execution file wil
     leverage: 2
     baseAssetAmountLimit: 100 // Set min. position size here to control slippage
 ```
+
+You can see more examples [here](src/exec/template)
 
 # Development
 
