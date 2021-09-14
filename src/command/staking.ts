@@ -19,7 +19,7 @@ const stakingCommand: CommandModule = {
         const config = await fetchConfiguration(stageName)
         const metadata = await fetchMetadata(stageName)
 
-        const provider = getProvider(Layer.Layer1, config)
+        const provider = getProvider(Layer.Layer1, config, argv)
         const layer1Contracts = metadata.layers.layer1.contracts
         const layer1ExternalContracts = metadata.layers.layer1.externalContracts
 

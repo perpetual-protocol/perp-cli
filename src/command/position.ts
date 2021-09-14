@@ -53,7 +53,7 @@ const positionCommand: CommandModule = {
         const stageName = getStageName(argv.stage)
         const metadata = await fetchMetadata(stageName)
         const config = await fetchConfiguration(stageName)
-        const provider = getProvider(Layer.Layer2, config)
+        const provider = getProvider(Layer.Layer2, config, argv)
         const clearingHouse = new Contract(
             metadata.layers.layer2.contracts.ClearingHouse.address,
             ClearingHouseArtifact.abi,

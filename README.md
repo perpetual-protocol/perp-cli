@@ -212,5 +212,5 @@ For testing, you can use `ts-node` to execute and test commands, e.g.:
 $ perp position
 
 # Testnet
-$ npx ts-node src/index.ts position
+$ npx ts-node src/cli/index.ts position
 ```

@@ -77,7 +77,7 @@ const execCommand: CommandModule = {
                 nonce: nonce ? BigNumber.from(nonce) : undefined,
             }
             const gasPriceForConsole = BigNumber.from(options.gasPrice).toNumber() / 1e9
-            const signer = wallet.connect(getProvider(layer, config))
+            const signer = wallet.connect(getProvider(layer, config, argv))
             const nextNonce = nonce ? BigNumber.from(nonce++) : await signer.getTransactionCount()
             console.log(formatTitle(action.action))
             console.log(

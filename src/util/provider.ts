@@ -1,6 +1,7 @@
-import { BigNumber, providers } from "ethers"
+import { BigNumber, getDefaultProvider, providers } from "ethers"
 import { Configuration } from "./metadata"
 import { Contract } from "@ethersproject/contracts"
+import { Arguments } from "yargs"
 
 export enum Layer {
     Layer1 = "layer1",
@@ -13,11 +14,30 @@ export enum NetworkName {
     Xdai = "xdai",
 }
 
-export function getProvider(layer: Layer, config: Configuration): providers.Provider {
-    if (layer === Layer.Layer1 && config.L1_WEB3_ENDPOINTS.length > 0) {
-        return new providers.WebSocketProvider(config.L1_WEB3_ENDPOINTS[0].url)
-    } else if (layer === Layer.Layer2 && config.L2_WEB3_ENDPOINTS.length > 0) {
-        return new providers.WebSocketProvider(config.L2_WEB3_ENDPOINTS[0].url)
+function getLayer1Provider(argv: Arguments) {
+    const layer1RpcUrl = argv.layer1RpcUrl as string
+
+    return layer1RpcUrl ? new providers.JsonRpcProvider(layer1RpcUrl) : getDefaultProvider()
+}
+
+function getLayer2Provider(config: Configuration, argv: Arguments) {
+    const layer2RpcUrl = argv.layer2RpcUrl as string
+    const wsUrlFromConfig = config.L2_WEB3_ENDPOINTS[0]?.url
+
+    if (layer2RpcUrl) {
+        return new providers.JsonRpcProvider(layer2RpcUrl)
+    } else if (wsUrlFromConfig) {
+        return new providers.WebSocketProvider(wsUrlFromConfig)
+    } else {
+        throw new Error("layer 2 provider not exists")
+    }
+}
+
+export function getProvider(layer: Layer, config: Configuration, argv: Arguments): providers.Provider {
+    if (layer === Layer.Layer1) {
+        return getLayer1Provider(argv)
+    } else if (layer === Layer.Layer2) {
+        return getLayer2Provider(config, argv)
     } else {
         throw new Error("provider not exists")
     }

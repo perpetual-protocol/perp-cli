@@ -24,7 +24,7 @@ function findContractInfo(metadata: Metadata, layer: Layer, contractAddress: str
 }
 
 function getContractModulePath() {
-    const perpContractPackagePath = dirname(require.resolve("@perp/contract/package.json"));
+    const perpContractPackagePath = dirname(require.resolve("@perp/contract/package.json"))
     return join(perpContractPackagePath, "build", "contracts")
 }
 
@@ -52,7 +52,7 @@ const verifyCommand: CommandModule = {
         const config = await fetchConfiguration(stageName)
         const metadata = await fetchMetadata(stageName)
         const layer = argv.layer === 2 ? Layer.Layer2 : Layer.Layer1
-        const provider = getProvider(layer, config)
+        const provider = getProvider(layer, config, argv)
         const contractInfo = findContractInfo(metadata, layer, address)
 
         if (!contractInfo) {
