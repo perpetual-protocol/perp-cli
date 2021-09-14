@@ -12,13 +12,25 @@ const SCRIPT_NAME = "perp"
 export function runner() {
     return yargs
         .scriptName(SCRIPT_NAME)
-        .option("stage", {
-            type: "string",
-            default: "production",
-        })
-        .option("commandline", {
-            type: "boolean",
-            default: "true",
+        .options({
+            stage: {
+                type: "string",
+                default: "production",
+            },
+            commandline: {
+                type: "boolean",
+                default: "true",
+            },
+            "layer1-rpc-url": {
+                type: "string",
+                default: "",
+                description: "https json rpc url for layer 1",
+            },
+            "layer2-rpc-url": {
+                type: "string",
+                default: "",
+                description: "https json rpc url for layer 2",
+            },
         })
         .command(positionHistory)
         .command(ammStatus)

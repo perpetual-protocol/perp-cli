@@ -27,7 +27,7 @@ const ammCommand: CommandModule = {
         const stageName = getStageName(argv.stage)
         const config = await fetchConfiguration(stageName)
         const metadata = await fetchMetadata(stageName)
-        const provider = getProvider(Layer.Layer2, config)
+        const provider = getProvider(Layer.Layer2, config, argv)
         const layer2Contracts = metadata.layers.layer2.contracts
         const flagShortList = argv.short as boolean
         const ammArg = argv.amm as string
@@ -102,17 +102,11 @@ const ammCommand: CommandModule = {
                 log(formatProperty("Proxy Address", addr))
                 log(formatProperty("Index Price", `${formatDecimal(indexPrice)} ${symbol}`))
                 log(formatProperty("Market Price", `${formatDecimal(marketPrice)} ${symbol}`))
-                log(
-                    formatProperty("OpenInterestNotionalCap", `${formatDecimal(openInterestNotionalCap)} ${symbol}`),
-                )
+                log(formatProperty("OpenInterestNotionalCap", `${formatDecimal(openInterestNotionalCap)} ${symbol}`))
                 log(formatProperty("OpenInterestNotional", `${formatDecimal(openInterestNotional)} ${symbol}`))
-                log(
-                    formatProperty("MaxHoldingBaseAsset", `${formatDecimal(maxHoldingBaseAsset)} ${priceFeedKey}`),
-                )
+                log(formatProperty("MaxHoldingBaseAsset", `${formatDecimal(maxHoldingBaseAsset)} ${priceFeedKey}`))
                 log(formatProperty("QuoteAssetReserve", `${formatDecimal(quoteAssetReserve)} ${symbol}`))
-                log(
-                    formatProperty("BaseAssetReserve", formatDecimal(baseAssetReserve)) + ` ${priceFeedKey}${symbol}`,
-                )
+                log(formatProperty("BaseAssetReserve", formatDecimal(baseAssetReserve)) + ` ${priceFeedKey}${symbol}`)
                 log(formatProperty("PriceFeed", priceFeedName))
                 log(formatProperty("est.funding rate", `${estFundingRate} %`))
                 log("")
