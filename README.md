@@ -1,6 +1,8 @@
-`perp-cli` is a CLI for showing information from Perpetual Protocol
+`perp-cli` is a CLI for showing information from Perpetual Protocol v1
 
 # Installation
+
+ℹ️ **This tool is for use with  Perp v1 which has been deprecated**
 
 ```bash
 $ npm install @perp/cli -g
